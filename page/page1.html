@@ -251,41 +251,44 @@
   }
 
   /* === Responsive === */
-  @media (max-width: 768px) {
-    .scrapbook {
-      column-count: 1; /* Dari 2 kolom jadi 1 */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .scrapbook p {
-      max-width: 100% !important;
-      width: 90%;
-      margin: 0 auto 20px;
-    }
-
-    .polaroid-group {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .polaroid-group .polaroid {
-      width: 90%;
-    }
-
-    .play-button {
-      width: 120px;
-      height: 120px;
-      font-size: 20px;
-    }
-
-    .back-button {
-      height: 60px;
-      padding: 0 30px;
-      font-size: 18px;
-    }
+ /* === Responsive === */
+@media (max-width: 768px) {
+  .scrapbook {
+    column-count: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
+
+  .scrapbook p {
+    max-width: 100% !important;
+    width: 90%;
+    margin: 0 auto 20px;
+  }
+
+  .polaroid-group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .polaroid-group .polaroid {
+    width: 90%;
+  }
+
+  /* Perbesar tombol */
+  .play-button {
+    width: 150px;
+    height: 150px;
+    font-size: 26px;
+  }
+
+  .back-button {
+    height: 70px;
+    padding: 0 35px;
+    font-size: 22px;
+  }
+}
+
 </style>
 
 <script>

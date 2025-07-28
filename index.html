@@ -22,21 +22,24 @@
   </head>
   <body>
     <canvas id="c"></canvas>
-    <audio id="bg-music" loop>
-      <source src="img/abtyou.mp3" type="audio/mpeg" />
-    </audio>
+    <div class="button-wrapper">
+      <button class="play-button" id="toggleMusic">Play</button>
+      <audio id="bgm" src="/img/abtyou.mp3" preload="auto"></audio>
+    </div>
 
     <script>
-      const music = document.getElementById("bg-music");
+      const audio = document.getElementById("bgm");
+      const button = document.getElementById("toggleMusic");
 
-      // Pastikan audio dimulai saat user klik layar
-      document.addEventListener(
-        "click",
-        () => {
-          music.play();
-        },
-        { once: true }
-      );
+      button.addEventListener("click", () => {
+        if (audio.paused) {
+          audio.play();
+          button.textContent = "Stop";
+        } else {
+          audio.pause();
+          button.textContent = "Play";
+        }
+      });
     </script>
 
     <div class="carousel">

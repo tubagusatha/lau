@@ -1,0 +1,330 @@
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css?family=Permanent+Marker&display=swap"
+/>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script&family=Indie+Flower&family=Patrick+Hand&family=Caveat&family=Shadows+Into+Light&display=swap"
+/>
+
+<article class="scrapbook">
+  <div class="controls">
+    <button class="play-button" id="toggleMusic">Play</button>
+    <audio id="bgm" src="/img/spwr.mp3" preload="auto"></audio>
+
+    <a href="/index.html" class="back-button">Back</a>
+  </div>
+
+  <script>
+    const audio = document.getElementById("bgm");
+    const button = document.getElementById("toggleMusic");
+
+    button.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        button.textContent = "Stop";
+      } else {
+        audio.pause();
+        button.textContent = "Play";
+      }
+    });
+  </script>
+
+  <h1>De Cindy Laura</h1>
+
+  <p>
+    Laura, bidadari yang turun dari langit, membawa cahaya lembut seperti fajar
+    pertama. Tatapannya menenangkan, bagai pelukan hangat dalam sepi.
+  </p>
+
+  <figure class="polaroid">
+    <img
+      src="/img/gambar10.jpg"
+      alt="Seorang wanita memandang laut."
+      title="Photo by Vicko Mozara for Unsplash"
+    />
+    <figcaption>Langkahnya seperti irama angin senja.</figcaption>
+  </figure>
+
+  <p>
+    Senyumnya bagai kilau rembulan, membasuh gelap menjadi keindahan. Setiap
+    kata yang terucap darinya terasa seperti untaian doa dari surga.
+  </p>
+
+  <div class="stitch">
+    <p>
+      Aku melihat Laura, seolah melihat lukisan alam, tak ada yang lebih indah
+      dari mata yang memancarkan ketulusan.
+    </p>
+  </div>
+
+  <figure class="polaroid">
+    <img
+      src="/img/gambar4.jpg"
+      alt="Cahaya senja di pantai."
+      title="Photo by Harrison Fitts for Unsplash"
+    />
+    <figcaption>Laura, cahaya dalam langkahku.</figcaption>
+  </figure>
+
+  <p>Jika cinta adalah lagu, maka namamu adalah melodi terindah,</p>
+
+  <div class="polaroid-group">
+    <figure class="polaroid">
+      <img
+        src="/img/gambar12.jpg"
+        alt="Langit malam bertabur bintang."
+        title="Photo by Emily Hoehenrieder for Unsplash"
+      />
+      <figcaption>Matanya, bintang di langit malamku.</figcaption>
+    </figure>
+
+    <figure class="polaroid">
+      <img
+        src="/img/gambar5.jpg"
+        alt="Langit biru cerah dengan awan putih."
+        title="Photo by Izuddin Helmi Adnan for Unsplash"
+      />
+      <figcaption>Namanya adalah langit, dan aku adalah awan.</figcaption>
+    </figure>
+  </div>
+
+  <p>
+    Laura, tak ada kata yang cukup untuk melukiskan keelokanmu. Kau adalah puisi
+    yang tak pernah selesai kutulis dalam hati.
+  </p>
+
+  <p>
+    Andai aku bisa membekukan waktu, aku akan memilih saat kau tersenyum, karena
+    di detik itu dunia terasa sempurna.
+  </p>
+
+  <p>
+    Untukmu, Laura, aku menulis baris-baris ini, doa dan rasa, tentang wanita
+    tercantik yang lahir dari cahaya cinta.
+  </p>
+</article>
+
+<style>
+  body {
+    background-image: url("/img/bgpink.jpg");
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    margin-top: 35px;
+  }
+  .controls {
+    position: fixed;
+    inset: 10px 10px auto 10px;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+  }
+  .back-button {
+    color: #242424;
+    text-decoration: none;
+    border-radius: 50px;
+    padding: 0 20px;
+    height: 50px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    background: rgb(205, 5, 118);
+  }
+
+  .play-button {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background-color: #ff6b81;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+  }
+
+  .play-button:hover {
+    background-color: #4778ff;
+    transform: scale(1.05);
+  }
+  .scrapbook {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0 auto;
+    padding: 15px;
+    column-count: 2; /* Layout awal tetap 2 kolom */
+    column-gap: 22px;
+    max-width: 1200px;
+  }
+
+  .scrapbook h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    font-family: "Permanent Marker", cursive;
+    padding: 10px 20px;
+    background-color: #ffeecc;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    transform: rotate(-2deg);
+  }
+
+  .scrapbook p {
+    position: relative;
+    padding: 10px;
+    background-color: #ffeecc;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transform: rotate(2deg);
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    max-width: 75% !important;
+  }
+
+  .random {
+    transform: rotate(calc(-2deg + 4deg * var(--rotation))) !important;
+    background-color: var(--bgcolor) !important;
+    font-family: var(--font) !important;
+    font-size: var(--fontsize) !important;
+    white-space: pre-wrap !important;
+  }
+
+  .polaroid {
+    position: relative;
+    display: inline-block;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transform: rotate(var(--rotation, -4deg));
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  .polaroid img {
+    display: block;
+    min-width: 100%;
+    object-fit: cover;
+    height: 345px;
+    overflow: hidden;
+  }
+
+  .polaroid figcaption {
+    font-family: "Permanent Marker", cursive;
+    font-size: 18px;
+    margin-top: 10px;
+    color: #333;
+  }
+
+  .polaroid-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .polaroid-group .polaroid {
+    width: 48%;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    color: black;
+    font-size: 12px;
+    text-align: right;
+    font-family: monospace;
+  }
+
+  .footer a {
+    color: black;
+    text-decoration: none;
+  }
+
+  /* === Responsive === */
+  @media (max-width: 768px) {
+    .scrapbook {
+      column-count: 1; /* Dari 2 kolom jadi 1 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .scrapbook p {
+      max-width: 100% !important;
+      width: 90%;
+      margin: 0 auto 20px;
+    }
+
+    .polaroid-group {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .polaroid-group .polaroid {
+      width: 90%;
+    }
+
+    .play-button {
+      width: 120px;
+      height: 120px;
+      font-size: 20px;
+    }
+
+    .back-button {
+      height: 60px;
+      padding: 0 30px;
+      font-size: 18px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const polaroids = document.querySelectorAll(".polaroid");
+    polaroids.forEach((polaroid) => {
+      const randomRotation = -2 + Math.random() * 4; // Rotate between -2deg and 2deg
+      const randomTop = Math.random() * 2 + "vh"; // Random vertical position
+
+      polaroid.style.setProperty("--rotation", randomRotation + "deg");
+      polaroid.style.top = randomTop;
+    });
+
+    const fonts = [
+      "Pacifico",
+      "Dancing Script",
+      "Indie Flower",
+      "Patrick Hand",
+      "Caveat",
+      "Shadows Into Light",
+    ];
+    const colors = ["#ffeecc", "#ffddaa", "#ddffee", "#ffccdd", "#ccffee"];
+
+    const paragraphs = document.querySelectorAll(".scrapbook p");
+    paragraphs.forEach((p) => {
+      const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const randomRotation = -1 + Math.random() * 2; // Rotate between -1deg and 2deg
+      const randomFontSize = 14 + Math.random() * 4; // Font size between 14px and 18px
+      const randomWidth = 60 + Math.random() * 40 + "%"; // Width between 60% and 100%
+      const randomLeft = Math.random() * 10 + "%"; // Left position between 0% and 10%
+
+      p.style.setProperty("--font", randomFont);
+      p.style.setProperty("--bgcolor", randomColor);
+      p.style.setProperty("--rotation", randomRotation);
+      p.style.setProperty("--fontsize", randomFontSize + "px");
+      p.style.width = randomWidth;
+      p.style.left = randomLeft;
+      p.classList.add("random");
+    });
+  });
+</script>

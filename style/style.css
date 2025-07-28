@@ -13,7 +13,7 @@ body {
 
   overflow-x: auto; /* Scroll horizontal */
   white-space: nowrap; /* Cegah tombol pindah ke baris baru */
-  padding: 10px;
+  padding: 5px;
 }
 
 .button-wrapper::-webkit-scrollbar {
@@ -30,8 +30,8 @@ body {
 }
 
 .play-button {
-  width: 90px;
-  height: 90px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   background-color: #ff6b81;
   border: none;

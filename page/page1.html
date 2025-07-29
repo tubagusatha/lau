@@ -1,333 +1,437 @@
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css?family=Permanent+Marker&display=swap"
-/>
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script&family=Indie+Flower&family=Patrick+Hand&family=Caveat&family=Shadows+Into+Light&display=swap"
-/>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Card memories</title>
 
-<article class="scrapbook">
-  <div class="controls">
-    <button class="play-button" id="toggleMusic">Play</button>
-    <audio id="bgm" src="/img/spwr.mp3" preload="auto"></audio>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Permanent+Marker&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script&family=Indie+Flower&family=Patrick+Hand&family=Caveat&family=Shadows+Into+Light&display=swap"
+    />
 
-    <a href="/index.html" class="back-button">Back</a>
-  </div>
-
-  <script>
-    const audio = document.getElementById("bgm");
-    const button = document.getElementById("toggleMusic");
-
-    button.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        button.textContent = "Stop";
-      } else {
-        audio.pause();
-        button.textContent = "Play";
+    <style>
+      body,
+      article.scrapbook {
+        font-weight: 200; /* Normal */
       }
-    });
-  </script>
 
-  <h1>De Cindy Laura</h1>
+      body,
+      html {
+        width: 100%;
+        margin: 0;
+        background: #111b29;
+        font-family: "Montserrat", sans-serif;
+        text-align: center;
+        overflow-x: hidden;
+        font-size: 16px;
+      }
 
-  <p>
-    Laura, bidadari yang turun dari langit, membawa cahaya lembut seperti fajar
-    pertama. Tatapannya menenangkan, bagai pelukan hangat dalam sepi.
-  </p>
+      .controls {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+      }
 
-  <figure class="polaroid">
-    <img
-      src="/img/gambar10.jpg"
-      alt="Seorang wanita memandang laut."
-      title="Photo by Vicko Mozara for Unsplash"
-    />
-    <figcaption>Langkahnya seperti irama angin senja.</figcaption>
-  </figure>
+      .back-button {
+        text-decoration: none;
+        border-radius: 50px;
+        padding: 0 20px;
+        height: 50px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        background: rgb(205, 5, 118);
+      }
 
-  <p>
-    Senyumnya bagai kilau rembulan, membasuh gelap menjadi keindahan. Setiap
-    kata yang terucap darinya terasa seperti untaian doa dari surga.
-  </p>
+      .play-button {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background-color: #ff6b81;
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s;
+      }
 
-  <div class="stitch">
-    <p>
-      Aku melihat Laura, seolah melihat lukisan alam, tak ada yang lebih indah
-      dari mata yang memancarkan ketulusan.
-    </p>
-  </div>
+      .play-button:hover {
+        background-color: #4778ff;
+        transform: scale(1.05);
+      }
 
-  <figure class="polaroid">
-    <img
-      src="/img/gambar4.jpg"
-      alt="Cahaya senja di pantai."
-      title="Photo by Harrison Fitts for Unsplash"
-    />
-    <figcaption>Laura, cahaya dalam langkahku.</figcaption>
-  </figure>
+      /* --- PARALLAX SECTION --- */
+      .scrollDist {
+        width: 100%;
+        height: 120vh; /* Scroll panjang agar parallax terasa */
+      }
 
-  <p>Jika cinta adalah lagu, maka namamu adalah melodi terindah,</p>
+      main.parallax-scene {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: #fff;
+        z-index: 1;
+        overflow: hidden;
+      }
 
-  <div class="polaroid-group">
-    <figure class="polaroid">
-      <img
-        src="/img/gambar12.jpg"
-        alt="Langit malam bertabur bintang."
-        title="Photo by Emily Hoehenrieder for Unsplash"
-      />
-      <figcaption>Matanya, bintang di langit malamku.</figcaption>
-    </figure>
+      main svg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
 
-    <figure class="polaroid">
-      <img
-        src="/img/gambar5.jpg"
-        alt="Langit biru cerah dengan awan putih."
-        title="Photo by Izuddin Helmi Adnan for Unsplash"
-      />
-      <figcaption>Namanya adalah langit, dan aku adalah awan.</figcaption>
-    </figure>
-  </div>
+      .explore-text {
+        font-size: 8vw;
+        dominant-baseline: middle;
+      }
 
-  <p>
-    Laura, tak ada kata yang cukup untuk melukiskan keelokanmu. Kau adalah puisi
-    yang tak pernah selesai kutulis dalam hati.
-  </p>
+      .arrow {
+        transform: translate(550px, 120px) scale(1);
+      }
 
-  <p>
-    Andai aku bisa membekukan waktu, aku akan memilih saat kau tersenyum, karena
-    di detik itu dunia terasa sempurna.
-  </p>
+      @media (max-width: 768px) {
+        .explore-text {
+          font-size: 12vw;
+        }
+        .arrow {
+          transform: translate(300px, 150px) scale(0.8);
+        }
+      }
 
-  <p>
-    Untukmu, Laura, aku menulis baris-baris ini, doa dan rasa, tentang wanita
-    tercantik yang lahir dari cahaya cinta.
-  </p>
-</article>
+      /* --- ARTICLE --- */
+      article.scrapbook {
+        position: relative;
+        z-index: 2;
+        margin-top: 50vh; /* muncul setelah parallax */
+        background: #fff;
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+        column-count: 2;
+        column-gap: 22px;
+        line-height: 1.6;
+      }
 
-<style>
-  body {
-    background-image: url("/img/bgpink.jpg");
-    margin: 0;
-    padding: 0;
-    justify-content: center;
-    align-items: center;
-    margin-top: 35px;
-  }
-  .controls {
-    position: fixed;
-    inset: 10px 10px auto 10px;
-    z-index: 10;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-  }
-  .back-button {
-    color: #242424;
-    text-decoration: none;
-    border-radius: 50px;
-    padding: 0 20px;
-    height: 50px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    background: rgb(205, 5, 118);
-  }
+      article.scrapbook h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        font-family: "Permanent Marker", cursive;
+        padding: 10px 20px;
+        background-color: #ffeecc;
+        border-radius: 5px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        display: inline-block;
+        transform: rotate(-2deg);
+      }
 
-  .play-button {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background-color: #ff6b81;
-    border: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s;
-  }
+      article.scrapbook p {
+        position: relative;
+        padding: 10px;
+        background-color: #ffeecc;
+        border-radius: 5px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transform: rotate(2deg);
+        font-size: 16px;
+        max-width: 100%;
+      }
 
-  .play-button:hover {
-    background-color: #4778ff;
-    transform: scale(1.05);
-  }
-  .scrapbook {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 0 auto;
-    padding: 15px;
-    column-count: 2; /* Layout awal tetap 2 kolom */
-    column-gap: 22px;
-    max-width: 1200px;
-  }
+      .polaroid {
+        position: relative;
+        display: inline-block;
+        padding: 10px;
+        background-color: #fff;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        width: 100%;
+      }
 
-  .scrapbook h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
-    font-family: "Permanent Marker", cursive;
-    padding: 10px 20px;
-    background-color: #ffeecc;
-    border-radius: 5px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    display: inline-block;
-    transform: rotate(-2deg);
-  }
+      .polaroid img {
+        display: block;
+        width: 100%;
+        object-fit: cover;
+        height: 345px;
+        overflow: hidden;
+      }
 
-  .scrapbook p {
-    position: relative;
-    padding: 10px;
-    background-color: #ffeecc;
-    border-radius: 5px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    transform: rotate(2deg);
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
-    max-width: 75% !important;
-  }
+      .polaroid figcaption {
+        font-family: "Permanent Marker", cursive;
+        font-size: 18px;
+        margin-top: 10px;
+        color: #333;
+      }
 
-  .random {
-    transform: rotate(calc(-2deg + 4deg * var(--rotation))) !important;
-    background-color: var(--bgcolor) !important;
-    font-family: var(--font) !important;
-    font-size: var(--fontsize) !important;
-    white-space: pre-wrap !important;
-  }
+      .polaroid-group {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
 
-  .polaroid {
-    position: relative;
-    display: inline-block;
-    padding: 10px;
-    background-color: #fff;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    transform: rotate(var(--rotation, -4deg));
-    margin-bottom: 20px;
-    width: 100%;
-  }
+      .polaroid-group .polaroid {
+        width: 48%;
+      }
 
-  .polaroid img {
-    display: block;
-    min-width: 100%;
-    object-fit: cover;
-    height: 345px;
-    overflow: hidden;
-  }
+      /* Responsive */
+      @media (max-width: 768px) {
+        article.scrapbook {
+          column-count: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
 
-  .polaroid figcaption {
-    font-family: "Permanent Marker", cursive;
-    font-size: 18px;
-    margin-top: 10px;
-    color: #333;
-  }
+        article.scrapbook p {
+          width: 90%;
+          margin: 0 auto 20px;
+        }
 
-  .polaroid-group {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
+        .polaroid-group {
+          flex-direction: column;
+          align-items: center;
+        }
 
-  .polaroid-group .polaroid {
-    width: 48%;
-  }
+        .polaroid-group .polaroid {
+          width: 90%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <button class="play-button" id="toggleMusic">Play</button>
+      <audio id="bgm" src="/img/spwr.mp3" preload="auto"></audio>
+      <a href="/index.html" class="back-button">Back</a>
+    </div>
 
-  .footer {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    color: black;
-    font-size: 12px;
-    text-align: right;
-    font-family: monospace;
-  }
+    <div class="scrollDist"></div>
 
-  .footer a {
-    color: black;
-    text-decoration: none;
-  }
+    <!-- PARALLAX -->
+    <main class="parallax-scene">
+      <svg
+        viewBox="0 0 1200 800"
+        preserveAspectRatio="xMidYMid slice"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <mask id="m">
+          <g class="cloud1">
+            <rect fill="#fff" width="100%" height="801" y="799" />
+            <image
+              xlink:href="https://assets.codepen.io/721952/cloud1Mask.jpg"
+              width="1200"
+              height="800"
+            />
+          </g>
+        </mask>
 
-  /* === Responsive === */
- /* === Responsive === */
-@media (max-width: 768px) {
-  .scrapbook {
-    column-count: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+        <image
+          class="sky"
+          xlink:href="https://assets.codepen.io/721952/sky.jpg"
+          width="1200"
+          height="590"
+        />
+        <image
+          class="mountBg"
+          xlink:href="https://assets.codepen.io/721952/mountBg.png"
+          width="1200"
+          height="800"
+        />
+        <image
+          class="mountMg"
+          xlink:href="https://assets.codepen.io/721952/mountMg.png"
+          width="1200"
+          height="800"
+        />
+        <image
+          class="cloud2"
+          xlink:href="https://assets.codepen.io/721952/cloud2.png"
+          width="1200"
+          height="800"
+        />
+        <image
+          class="mountFg"
+          xlink:href="https://assets.codepen.io/721952/mountFg.png"
+          width="1200"
+          height="800"
+        />
+        <image
+          class="cloud1"
+          xlink:href="https://assets.codepen.io/721952/cloud1.png"
+          width="1200"
+          height="800"
+        />
+        <image
+          class="cloud3"
+          xlink:href="https://assets.codepen.io/721952/cloud3.png"
+          width="1200"
+          height="800"
+        />
 
-  .scrapbook p {
-    max-width: 100% !important;
-    width: 90%;
-    margin: 0 auto 20px;
-  }
+        <text
+          class="explore-text"
+          fill="#fff"
+          text-anchor="middle"
+          x="50%"
+          y="40%"
+        >
+          LAURA
+        </text>
 
-  .polaroid-group {
-    flex-direction: column;
-    align-items: center;
-  }
+        <polyline
+          class="arrow"
+          fill="#fff"
+          points="599,350 599,389 590,379 590,382 600,392 610,382 610,379 601,389 601,350"
+          transform="translate(300,100)"
+        />
 
-  .polaroid-group .polaroid {
-    width: 90%;
-  }
+        <g mask="url(#m)">
+          <rect fill="#fff" width="100%" height="100%" />
+          <text
+            class="explore-text"
+            x="50%"
+            y="40%"
+            text-anchor="middle"
+            fill="#162a43"
+          >
+            CINDY
+          </text>
+        </g>
 
-  /* Perbesar tombol */
-  .play-button {
-    width: 150px;
-    height: 150px;
-    font-size: 26px;
-  }
+        <rect
+          id="arrow-btn"
+          width="100"
+          height="100"
+          opacity="0"
+          x="550"
+          y="320"
+          style="cursor: pointer"
+        />
+      </svg>
+    </main>
 
-  .back-button {
-    height: 70px;
-    padding: 0 35px;
-    font-size: 22px;
-  }
-}
+    <!-- ARTICLE -->
+    <article class="scrapbook">
+      <h1>De Cindy Laura</h1>
+      <p>Laura, bidadari yang turun dari langit...</p>
 
-</style>
+      <figure class="polaroid">
+        <img src="/img/gambar10.jpg" alt="..." />
+        <figcaption>Langkahnya seperti irama angin senja.</figcaption>
+      </figure>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const polaroids = document.querySelectorAll(".polaroid");
-    polaroids.forEach((polaroid) => {
-      const randomRotation = -2 + Math.random() * 4; // Rotate between -2deg and 2deg
-      const randomTop = Math.random() * 2 + "vh"; // Random vertical position
+      <p>Senyumnya bagai kilau rembulan...</p>
 
-      polaroid.style.setProperty("--rotation", randomRotation + "deg");
-      polaroid.style.top = randomTop;
-    });
+      <div class="stitch">
+        <p>Aku melihat Laura, seolah melihat lukisan alam...</p>
+      </div>
 
-    const fonts = [
-      "Pacifico",
-      "Dancing Script",
-      "Indie Flower",
-      "Patrick Hand",
-      "Caveat",
-      "Shadows Into Light",
-    ];
-    const colors = ["#ffeecc", "#ffddaa", "#ddffee", "#ffccdd", "#ccffee"];
+      <figure class="polaroid">
+        <img src="/img/gambar4.jpg" alt="..." />
+        <figcaption>Laura, cahaya dalam langkahku.</figcaption>
+      </figure>
 
-    const paragraphs = document.querySelectorAll(".scrapbook p");
-    paragraphs.forEach((p) => {
-      const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      const randomRotation = -1 + Math.random() * 2; // Rotate between -1deg and 2deg
-      const randomFontSize = 14 + Math.random() * 4; // Font size between 14px and 18px
-      const randomWidth = 60 + Math.random() * 40 + "%"; // Width between 60% and 100%
-      const randomLeft = Math.random() * 10 + "%"; // Left position between 0% and 10%
+      <p>Jika cinta adalah lagu...</p>
 
-      p.style.setProperty("--font", randomFont);
-      p.style.setProperty("--bgcolor", randomColor);
-      p.style.setProperty("--rotation", randomRotation);
-      p.style.setProperty("--fontsize", randomFontSize + "px");
-      p.style.width = randomWidth;
-      p.style.left = randomLeft;
-      p.classList.add("random");
-    });
-  });
-</script>
+      <div class="polaroid-group">
+        <figure class="polaroid">
+          <img src="/img/gambar12.jpg" alt="..." />
+          <figcaption>Matanya, bintang di langit malamku.</figcaption>
+        </figure>
+        <figure class="polaroid">
+          <img src="/img/gambar5.jpg" alt="..." />
+          <figcaption>Namanya adalah langit, dan aku adalah awan.</figcaption>
+        </figure>
+      </div>
+
+      <p>Laura, tak ada kata yang cukup...</p>
+      <p>Andai aku bisa membekukan waktu...</p>
+      <p>Untukmu, Laura, aku menulis baris-baris ini...</p>
+    </article>
+
+    <!-- GSAP -->
+    <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/gsap@3/dist/ScrollToPlugin.min.js"></script>
+
+    <script>
+      const audio = document.getElementById("bgm");
+      const button = document.getElementById("toggleMusic");
+      button.addEventListener("click", () => {
+        if (audio.paused) {
+          audio.play();
+          button.textContent = "Stop";
+        } else {
+          audio.pause();
+          button.textContent = "Play";
+        }
+      });
+
+      // Parallax background
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: ".scrollDist",
+            start: "0 0",
+            end: "100% 100%",
+            scrub: 1,
+          },
+        })
+        .fromTo(".sky", { y: 0 }, { y: -200 }, 0)
+        .fromTo(".cloud1", { y: 100 }, { y: -800 }, 0)
+        .fromTo(".cloud2", { y: -150 }, { y: -500 }, 0)
+        .fromTo(".cloud3", { y: -50 }, { y: -650 }, 0)
+        .fromTo(".mountBg", { y: -10 }, { y: -100 }, 0)
+        .fromTo(".mountMg", { y: -30 }, { y: -250 }, 0)
+        .fromTo(".mountFg", { y: -50 }, { y: -600 }, 0);
+
+      // Scroll arrow
+      const arrowBtn = document.querySelector("#arrow-btn");
+      arrowBtn.addEventListener("mouseenter", () => {
+        gsap.to(".arrow", { y: 10, duration: 0.8, ease: "back.inOut(3)" });
+      });
+      arrowBtn.addEventListener("mouseleave", () => {
+        gsap.to(".arrow", { y: 0, duration: 0.5, ease: "power3.out" });
+      });
+      arrowBtn.addEventListener("click", () => {
+        gsap.to(window, { scrollTo: innerHeight, duration: 1.5 });
+      });
+
+      // Fade-in animation for article elements
+      gsap.utils.toArray(".scrapbook p, .scrapbook figure").forEach((el) => {
+        gsap.from(el, {
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+          },
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.out",
+        });
+      });
+    </script>
+  </body>
+</html>

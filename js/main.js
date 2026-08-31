@@ -6,12 +6,8 @@ let startX = 0
 let active = 0
 let isDown = false
 
-/*
-  Tambahan untuk performance.
-  Tidak mengubah fungsi carousel.
-*/
 let animationFrame = null
-let lastAnimatedProgress = progress
+let pendingRender = false
 let didDrag = false
 
 
@@ -20,6 +16,14 @@ Constants
 --------------------*/
 const speedWheel = 0.02
 const speedDrag = -0.1
+
+/*
+  Jumlah video yang boleh tetap bergerak
+  di sekitar card aktif.
+
+  1 = card aktif + 1 kiri + 1 kanan
+*/
+const VIDEO_RANGE = 1
 
 
 /*--------------------
@@ -32,44 +36,42 @@ const $cursors = document.querySelectorAll('.cursor')
 /*--------------------
 Videos
 --------------------*/
-const $videos = document.querySelectorAll(
-  '.carousel-item video'
-)
+const $videos = []
 
-/*
-  Berapa card dari posisi aktif yang
-  videonya boleh tetap berjalan.
+$items.forEach((item, index) => {
 
-  Tidak dibuat terlalu kecil supaya
-  video di sekitar card tetap bergerak.
-*/
-const VIDEO_RANGE = 2
+  const video = item.querySelector('video')
+
+  if (!video) return
+
+  $videos.push({
+    video,
+    index
+  })
+
+})
+
 
 let lastVideoActive = -1
 
 
+/*--------------------
+Update Videos
+--------------------*/
 const updateVideos = () => {
 
   /*
-    Kalau tidak ada video, langsung selesai.
+    Jangan lakukan apa-apa kalau active
+    belum berubah.
   */
-  if (!$videos.length) return
-
-  /*
-    Tidak perlu menjalankan fungsi ini
-    kalau active belum berubah.
-  */
-  if (active === lastVideoActive) return
+  if (active === lastVideoActive) {
+    return
+  }
 
   lastVideoActive = active
 
 
-  $items.forEach((item, index) => {
-
-    const video = item.querySelector('video')
-
-    if (!video) return
-
+  $videos.forEach(({ video, index }) => {
 
     const distance =
       Math.abs(index - active)
@@ -78,71 +80,34 @@ const updateVideos = () => {
     if (distance <= VIDEO_RANGE) {
 
       /*
-        Video dekat card aktif tetap berjalan.
+        Video yang dekat tengah tetap jalan.
       */
 
       video.muted = true
       video.defaultMuted = true
       video.playsInline = true
 
-      /*
-        Browser mobile kadang menolak play().
-        Jangan sampai error tersebut
-        menghentikan main.js.
-      */
-      const playPromise = video.play()
+      const promise = video.play()
 
       if (
-        playPromise &&
-        typeof playPromise.catch === 'function'
+        promise &&
+        typeof promise.catch === 'function'
       ) {
-        playPromise.catch(() => {})
+        promise.catch(() => {})
       }
 
     } else {
 
       /*
-        Hanya PAUSE.
-        
-        Jangan hapus src.
-        Jangan video.load().
-        Jangan reload video.
-
-        Jadi ketika card kembali aktif,
-        video bisa lanjut tanpa memaksa
-        download ulang.
+        Cukup pause.
+        JANGAN load ulang.
       */
-      video.pause()
+
+      if (!video.paused) {
+        video.pause()
+      }
 
     }
-
-  })
-
-}
-
-
-/*--------------------
-Get Z
---------------------*/
-
-/*
-  Versi lama kamu membuat array/map
-  baru setiap kali card dihitung.
-
-  Dengan 61 card, itu cukup boros.
-
-  Rumus hasilnya TETAP SAMA.
-*/
-const getZindex = (array, index) => {
-
-  return array.map((_, i) => {
-
-    return (
-      index === i
-        ? array.length
-        : array.length -
-          Math.abs(index - i)
-    )
 
   })
 
@@ -159,16 +124,23 @@ const displayItems = (
 ) => {
 
   /*
-    Hasil tetap sama seperti original.
+    Ini menghasilkan nilai yang sama
+    seperti getZindex() original,
+    tetapi tanpa membuat array baru.
   */
+
   const zIndex =
-    $items.length -
-    Math.abs(currentActive - index)
+    index === currentActive
+      ? $items.length
+      : $items.length -
+        Math.abs(currentActive - index)
+
 
   item.style.setProperty(
     '--zIndex',
     zIndex
   )
+
 
   item.style.setProperty(
     '--active',
@@ -191,7 +163,7 @@ const animate = () => {
     )
 
 
-  active =
+  const newActive =
     Math.floor(
       progress /
       100 *
@@ -199,8 +171,11 @@ const animate = () => {
     )
 
 
+  active = newActive
+
+
   /*
-    Tetap update SEMUA card seperti original.
+    Update semua card.
   */
   $items.forEach(
     (item, index) => {
@@ -216,8 +191,8 @@ const animate = () => {
 
 
   /*
-    Atur video hanya ketika active
-    card berubah.
+    Video hanya diatur kalau
+    card aktif berubah.
   */
   updateVideos()
 
@@ -225,57 +200,22 @@ const animate = () => {
 
 
 /*--------------------
-Smooth Animate
+Frame Scheduler
 --------------------*/
+const scheduleAnimate = () => {
 
-/*
-  Ini bagian PALING PENTING.
-
-  Original kamu:
-
-      touchmove
-          ↓
-      animate()
-          ↓
-      61 card dihitung
-
-  berkali-kali dalam satu detik.
-
-  Sekarang:
-
-      touchmove
-          ↓
-      requestAnimationFrame
-          ↓
-      animate() maksimal 1x/frame
-*/
-
-const requestAnimate = () => {
-
-  if (animationFrame !== null) {
+  if (pendingRender) {
     return
   }
+
+  pendingRender = true
 
 
   animationFrame =
     requestAnimationFrame(() => {
 
+      pendingRender = false
       animationFrame = null
-
-      /*
-        Tidak ada perubahan berarti,
-        tidak perlu render ulang.
-      */
-      if (
-        progress === lastAnimatedProgress
-      ) {
-        return
-      }
-
-
-      lastAnimatedProgress =
-        progress
-
 
       animate()
 
@@ -284,9 +224,9 @@ const requestAnimate = () => {
 }
 
 
-/*
-  Initial render.
-*/
+/*--------------------
+Initial
+--------------------*/
 animate()
 
 
@@ -300,19 +240,11 @@ $items.forEach((item, i) => {
     (event) => {
 
       /*
-        Kalau user sebenarnya sedang swipe,
-        jangan perlakukan sebagai click.
+        Jangan anggap swipe sebagai click.
       */
       if (didDrag) {
 
         event.preventDefault()
-
-        /*
-          Reset sebentar setelah event click.
-        */
-        setTimeout(() => {
-          didDrag = false
-        }, 50)
 
         return
 
@@ -325,7 +257,7 @@ $items.forEach((item, i) => {
         10
 
 
-      requestAnimate()
+      scheduleAnimate()
 
     }
   )
@@ -334,33 +266,27 @@ $items.forEach((item, i) => {
 
 
 /*--------------------
-Handlers
+Wheel
 --------------------*/
-
 const handleWheel = e => {
 
-  const wheelProgress =
-    e.deltaY * speedWheel
+  progress +=
+    e.deltaY *
+    speedWheel
 
 
-  progress =
-    progress +
-    wheelProgress
-
-
-  requestAnimate()
+  scheduleAnimate()
 
 }
 
 
 /*--------------------
-Mouse Move
+Mouse / Touch Move
 --------------------*/
-
-const handleMouseMove = (e) => {
+const handleMouseMove = e => {
 
   /*
-    Cursor tetap SAMA seperti original.
+    Cursor desktop.
   */
   if (e.type === 'mousemove') {
 
@@ -377,7 +303,9 @@ const handleMouseMove = (e) => {
   }
 
 
-  if (!isDown) return
+  if (!isDown) {
+    return
+  }
 
 
   const x =
@@ -391,8 +319,8 @@ const handleMouseMove = (e) => {
 
 
   /*
-    Kalau bergerak lebih dari sedikit,
-    tandai sebagai drag/swipe.
+    Tandai sebagai drag setelah
+    bergerak sedikit.
   */
   if (
     Math.abs(x - startX) > 5
@@ -408,8 +336,7 @@ const handleMouseMove = (e) => {
     speedDrag
 
 
-  progress =
-    progress +
+  progress +=
     mouseProgress
 
 
@@ -417,18 +344,16 @@ const handleMouseMove = (e) => {
 
 
   /*
-    JANGAN langsung animate().
-    Ini yang membuat HP lebih ringan.
+    Tidak langsung animate().
   */
-  requestAnimate()
+  scheduleAnimate()
 
 }
 
 
 /*--------------------
-Mouse Down
+Mouse / Touch Down
 --------------------*/
-
 const handleMouseDown = e => {
 
   isDown = true
@@ -449,30 +374,23 @@ const handleMouseDown = e => {
 
 
 /*--------------------
-Mouse Up
+Mouse / Touch Up
 --------------------*/
-
 const handleMouseUp = () => {
 
   isDown = false
 
+
   /*
-    Kalau bukan drag, biarkan click bekerja.
+    Biarkan click event selesai dulu.
   */
-  if (!didDrag) {
-    return
+  if (didDrag) {
+
+    setTimeout(() => {
+      didDrag = false
+    }, 100)
+
   }
-
-  /*
-    Jangan langsung reset supaya
-    click event tidak salah membaca swipe
-    sebagai klik card.
-  */
-  setTimeout(() => {
-
-    didDrag = false
-
-  }, 100)
 
 }
 
@@ -480,11 +398,6 @@ const handleMouseUp = () => {
 /*--------------------
 Listeners
 --------------------*/
-
-/*
-  Tetap memakai listener ASLI kamu.
-  Jadi tidak menyentuh hamburger/menu.
-*/
 
 document.addEventListener(
   'mousewheel',

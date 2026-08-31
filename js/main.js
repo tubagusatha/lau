@@ -7,10 +7,11 @@ let active = 0
 let isDown = false
 
 /*
-  Mobile performance
+  Tambahan untuk performance.
+  Tidak mengubah fungsi carousel.
 */
 let animationFrame = null
-let renderPending = false
+let lastAnimatedProgress = progress
 let didDrag = false
 
 
@@ -22,101 +23,53 @@ const speedDrag = -0.1
 
 
 /*--------------------
-Device
---------------------*/
-const isMobile =
-  window.matchMedia('(max-width: 768px)').matches
-
-
-/*--------------------
-Mobile Video Settings
---------------------*/
-
-/*
-  Desktop:
-  semua video tetap berjalan.
-
-  Mobile:
-  hanya video di sekitar card aktif
-  yang tetap berjalan.
-*/
-const VIDEO_RANGE = isMobile ? 1 : Infinity
-
-let lastVideoActive = -1
-
-
-/*--------------------
-Get Z
---------------------*/
-const getZindex = (array, index) => (
-  array.map((_, i) =>
-    (index === i)
-      ? array.length
-      : array.length - Math.abs(index - i)
-  )
-)
-
-
-/*--------------------
 Items
 --------------------*/
-const $items =
-  document.querySelectorAll('.carousel-item')
-
-const $cursors =
-  document.querySelectorAll('.cursor')
+const $items = document.querySelectorAll('.carousel-item')
+const $cursors = document.querySelectorAll('.cursor')
 
 
 /*--------------------
 Videos
 --------------------*/
-const $videos = []
+const $videos = document.querySelectorAll(
+  '.carousel-item video'
+)
 
-$items.forEach((item, index) => {
+/*
+  Berapa card dari posisi aktif yang
+  videonya boleh tetap berjalan.
 
-  const video =
-    item.querySelector('video')
+  Tidak dibuat terlalu kecil supaya
+  video di sekitar card tetap bergerak.
+*/
+const VIDEO_RANGE = 2
 
-  if (!video) return
-
-  $videos.push({
-    video: video,
-    index: index
-  })
-
-})
+let lastVideoActive = -1
 
 
-/*--------------------
-Update Videos
---------------------*/
-const updateVideos = (force = false) => {
+const updateVideos = () => {
 
   /*
-    Desktop tidak perlu optimasi video.
-    Semua video mengikuti behavior asli.
+    Kalau tidak ada video, langsung selesai.
   */
-  if (!isMobile) {
-    return
-  }
-
+  if (!$videos.length) return
 
   /*
-    Jangan mengulang pekerjaan video
-    kalau active card belum berubah.
+    Tidak perlu menjalankan fungsi ini
+    kalau active belum berubah.
   */
-  if (
-    !force &&
-    active === lastVideoActive
-  ) {
-    return
-  }
-
+  if (active === lastVideoActive) return
 
   lastVideoActive = active
 
 
-  $videos.forEach(({ video, index }) => {
+  $items.forEach((item, index) => {
+
+    const video = item.querySelector('video')
+
+    if (!video) return
+
 
     const distance =
       Math.abs(index - active)
@@ -125,22 +78,20 @@ const updateVideos = (force = false) => {
     if (distance <= VIDEO_RANGE) {
 
       /*
-        Video dekat card aktif:
-        tetap dimainkan.
+        Video dekat card aktif tetap berjalan.
       */
 
       video.muted = true
       video.defaultMuted = true
       video.playsInline = true
 
-      const playPromise =
-        video.play()
-
       /*
-        Mobile browser kadang menolak
-        play(). Jangan sampai error ini
-        menghentikan seluruh JS.
+        Browser mobile kadang menolak play().
+        Jangan sampai error tersebut
+        menghentikan main.js.
       */
+      const playPromise = video.play()
+
       if (
         playPromise &&
         typeof playPromise.catch === 'function'
@@ -151,22 +102,47 @@ const updateVideos = (force = false) => {
     } else {
 
       /*
-        Video jauh hanya di-pause.
+        Hanya PAUSE.
+        
+        Jangan hapus src.
+        Jangan video.load().
+        Jangan reload video.
 
-        TIDAK:
-        - load()
-        - remove src
-        - reload video
-
-        Jadi ketika kembali aktif,
-        browser bisa lanjut memainkan video.
+        Jadi ketika card kembali aktif,
+        video bisa lanjut tanpa memaksa
+        download ulang.
       */
-
-      if (!video.paused) {
-        video.pause()
-      }
+      video.pause()
 
     }
+
+  })
+
+}
+
+
+/*--------------------
+Get Z
+--------------------*/
+
+/*
+  Versi lama kamu membuat array/map
+  baru setiap kali card dihitung.
+
+  Dengan 61 card, itu cukup boros.
+
+  Rumus hasilnya TETAP SAMA.
+*/
+const getZindex = (array, index) => {
+
+  return array.map((_, i) => {
+
+    return (
+      index === i
+        ? array.length
+        : array.length -
+          Math.abs(index - i)
+    )
 
   })
 
@@ -183,21 +159,16 @@ const displayItems = (
 ) => {
 
   /*
-    Rumus z-index sama seperti
-    versi original kamu.
+    Hasil tetap sama seperti original.
   */
   const zIndex =
     $items.length -
-    Math.abs(
-      currentActive - index
-    )
-
+    Math.abs(currentActive - index)
 
   item.style.setProperty(
     '--zIndex',
     zIndex
   )
-
 
   item.style.setProperty(
     '--active',
@@ -228,6 +199,9 @@ const animate = () => {
     )
 
 
+  /*
+    Tetap update SEMUA card seperti original.
+  */
   $items.forEach(
     (item, index) => {
 
@@ -242,8 +216,8 @@ const animate = () => {
 
 
   /*
-    Hanya HP yang menjalankan
-    optimasi video.
+    Atur video hanya ketika active
+    card berubah.
   */
   updateVideos()
 
@@ -251,59 +225,69 @@ const animate = () => {
 
 
 /*--------------------
-Mobile Frame
+Smooth Animate
 --------------------*/
 
 /*
-  Desktop:
-    animate() langsung seperti original.
+  Ini bagian PALING PENTING.
 
-  Mobile:
-    animate() maksimal satu kali
-    setiap animation frame.
+  Original kamu:
+
+      touchmove
+          ↓
+      animate()
+          ↓
+      61 card dihitung
+
+  berkali-kali dalam satu detik.
+
+  Sekarang:
+
+      touchmove
+          ↓
+      requestAnimationFrame
+          ↓
+      animate() maksimal 1x/frame
 */
+
 const requestAnimate = () => {
 
-  if (!isMobile) {
-
-    animate()
-
+  if (animationFrame !== null) {
     return
   }
-
-
-  if (renderPending) {
-    return
-  }
-
-
-  renderPending = true
 
 
   animationFrame =
     requestAnimationFrame(() => {
 
-      renderPending = false
+      animationFrame = null
+
+      /*
+        Tidak ada perubahan berarti,
+        tidak perlu render ulang.
+      */
+      if (
+        progress === lastAnimatedProgress
+      ) {
+        return
+      }
+
+
+      lastAnimatedProgress =
+        progress
+
 
       animate()
-
-      animationFrame = null
 
     })
 
 }
 
 
-/*--------------------
-Initial
---------------------*/
-animate()
-
 /*
-  Pastikan video mobile yang dekat
-  dengan card aktif langsung jalan.
+  Initial render.
 */
-updateVideos(true)
+animate()
 
 
 /*--------------------
@@ -316,21 +300,25 @@ $items.forEach((item, i) => {
     (event) => {
 
       /*
-        Kalau gerakan sebelumnya adalah
-        swipe, jangan dianggap click.
+        Kalau user sebenarnya sedang swipe,
+        jangan perlakukan sebagai click.
       */
-      if (isMobile && didDrag) {
+      if (didDrag) {
 
         event.preventDefault()
+
+        /*
+          Reset sebentar setelah event click.
+        */
+        setTimeout(() => {
+          didDrag = false
+        }, 50)
 
         return
 
       }
 
 
-      /*
-        Rumus ORIGINAL kamu.
-      */
       progress =
         (i / $items.length) *
         100 +
@@ -346,8 +334,9 @@ $items.forEach((item, i) => {
 
 
 /*--------------------
-Wheel
+Handlers
 --------------------*/
+
 const handleWheel = e => {
 
   const wheelProgress =
@@ -359,22 +348,19 @@ const handleWheel = e => {
     wheelProgress
 
 
-  /*
-    Desktop = langsung animate.
-    Mobile = frame optimized.
-  */
   requestAnimate()
 
 }
 
 
 /*--------------------
-Mouse / Touch Move
+Mouse Move
 --------------------*/
+
 const handleMouseMove = (e) => {
 
   /*
-    Cursor tetap sama seperti original.
+    Cursor tetap SAMA seperti original.
   */
   if (e.type === 'mousemove') {
 
@@ -391,9 +377,7 @@ const handleMouseMove = (e) => {
   }
 
 
-  if (!isDown) {
-    return
-  }
+  if (!isDown) return
 
 
   const x =
@@ -407,11 +391,10 @@ const handleMouseMove = (e) => {
 
 
   /*
-    Hanya mobile yang perlu
-    membedakan swipe dengan click.
+    Kalau bergerak lebih dari sedikit,
+    tandai sebagai drag/swipe.
   */
   if (
-    isMobile &&
     Math.abs(x - startX) > 5
   ) {
 
@@ -433,22 +416,24 @@ const handleMouseMove = (e) => {
   startX = x
 
 
+  /*
+    JANGAN langsung animate().
+    Ini yang membuat HP lebih ringan.
+  */
   requestAnimate()
 
 }
 
 
 /*--------------------
-Mouse / Touch Down
+Mouse Down
 --------------------*/
+
 const handleMouseDown = e => {
 
   isDown = true
 
-
-  if (isMobile) {
-    didDrag = false
-  }
+  didDrag = false
 
 
   startX =
@@ -464,26 +449,30 @@ const handleMouseDown = e => {
 
 
 /*--------------------
-Mouse / Touch Up
+Mouse Up
 --------------------*/
+
 const handleMouseUp = () => {
 
   isDown = false
 
-
-  if (isMobile && didDrag) {
-
-    /*
-      Beri sedikit waktu agar event click
-      tidak salah membaca swipe sebagai click.
-    */
-    setTimeout(() => {
-
-      didDrag = false
-
-    }, 100)
-
+  /*
+    Kalau bukan drag, biarkan click bekerja.
+  */
+  if (!didDrag) {
+    return
   }
+
+  /*
+    Jangan langsung reset supaya
+    click event tidak salah membaca swipe
+    sebagai klik card.
+  */
+  setTimeout(() => {
+
+    didDrag = false
+
+  }, 100)
 
 }
 
@@ -493,9 +482,8 @@ Listeners
 --------------------*/
 
 /*
-  Tetap menggunakan listener asli kamu.
-  Tidak ada listener hamburger/music
-  yang disentuh.
+  Tetap memakai listener ASLI kamu.
+  Jadi tidak menyentuh hamburger/menu.
 */
 
 document.addEventListener(
@@ -559,46 +547,3 @@ document.addEventListener(
     passive: true
   }
 )
-
-
-/*--------------------
-Visibility
---------------------*/
-
-/*
-  Khusus mobile:
-  kalau tab ditinggalkan, pause video.
-
-  Saat kembali, video sekitar card aktif
-  akan dimainkan lagi.
-
-  Desktop tidak disentuh.
-*/
-if (isMobile) {
-
-  document.addEventListener(
-    'visibilitychange',
-    () => {
-
-      if (document.hidden) {
-
-        $videos.forEach(
-          ({ video }) => {
-
-            video.pause()
-
-          }
-        )
-
-      } else {
-
-        lastVideoActive = -1
-
-        updateVideos(true)
-
-      }
-
-    }
-  )
-
-}

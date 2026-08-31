@@ -6,8 +6,11 @@ let startX = 0
 let active = 0
 let isDown = false
 
+/*
+  Mobile performance
+*/
 let animationFrame = null
-let pendingRender = false
+let renderPending = false
 let didDrag = false
 
 
@@ -17,20 +20,51 @@ Constants
 const speedWheel = 0.02
 const speedDrag = -0.1
 
-/*
-  Jumlah video yang boleh tetap bergerak
-  di sekitar card aktif.
 
-  1 = card aktif + 1 kiri + 1 kanan
+/*--------------------
+Device
+--------------------*/
+const isMobile =
+  window.matchMedia('(max-width: 768px)').matches
+
+
+/*--------------------
+Mobile Video Settings
+--------------------*/
+
+/*
+  Desktop:
+  semua video tetap berjalan.
+
+  Mobile:
+  hanya video di sekitar card aktif
+  yang tetap berjalan.
 */
-const VIDEO_RANGE = 1
+const VIDEO_RANGE = isMobile ? 1 : Infinity
+
+let lastVideoActive = -1
+
+
+/*--------------------
+Get Z
+--------------------*/
+const getZindex = (array, index) => (
+  array.map((_, i) =>
+    (index === i)
+      ? array.length
+      : array.length - Math.abs(index - i)
+  )
+)
 
 
 /*--------------------
 Items
 --------------------*/
-const $items = document.querySelectorAll('.carousel-item')
-const $cursors = document.querySelectorAll('.cursor')
+const $items =
+  document.querySelectorAll('.carousel-item')
+
+const $cursors =
+  document.querySelectorAll('.cursor')
 
 
 /*--------------------
@@ -40,33 +74,44 @@ const $videos = []
 
 $items.forEach((item, index) => {
 
-  const video = item.querySelector('video')
+  const video =
+    item.querySelector('video')
 
   if (!video) return
 
   $videos.push({
-    video,
-    index
+    video: video,
+    index: index
   })
 
 })
 
 
-let lastVideoActive = -1
-
-
 /*--------------------
 Update Videos
 --------------------*/
-const updateVideos = () => {
+const updateVideos = (force = false) => {
 
   /*
-    Jangan lakukan apa-apa kalau active
-    belum berubah.
+    Desktop tidak perlu optimasi video.
+    Semua video mengikuti behavior asli.
   */
-  if (active === lastVideoActive) {
+  if (!isMobile) {
     return
   }
+
+
+  /*
+    Jangan mengulang pekerjaan video
+    kalau active card belum berubah.
+  */
+  if (
+    !force &&
+    active === lastVideoActive
+  ) {
+    return
+  }
+
 
   lastVideoActive = active
 
@@ -80,27 +125,41 @@ const updateVideos = () => {
     if (distance <= VIDEO_RANGE) {
 
       /*
-        Video yang dekat tengah tetap jalan.
+        Video dekat card aktif:
+        tetap dimainkan.
       */
 
       video.muted = true
       video.defaultMuted = true
       video.playsInline = true
 
-      const promise = video.play()
+      const playPromise =
+        video.play()
 
+      /*
+        Mobile browser kadang menolak
+        play(). Jangan sampai error ini
+        menghentikan seluruh JS.
+      */
       if (
-        promise &&
-        typeof promise.catch === 'function'
+        playPromise &&
+        typeof playPromise.catch === 'function'
       ) {
-        promise.catch(() => {})
+        playPromise.catch(() => {})
       }
 
     } else {
 
       /*
-        Cukup pause.
-        JANGAN load ulang.
+        Video jauh hanya di-pause.
+
+        TIDAK:
+        - load()
+        - remove src
+        - reload video
+
+        Jadi ketika kembali aktif,
+        browser bisa lanjut memainkan video.
       */
 
       if (!video.paused) {
@@ -124,16 +183,14 @@ const displayItems = (
 ) => {
 
   /*
-    Ini menghasilkan nilai yang sama
-    seperti getZindex() original,
-    tetapi tanpa membuat array baru.
+    Rumus z-index sama seperti
+    versi original kamu.
   */
-
   const zIndex =
-    index === currentActive
-      ? $items.length
-      : $items.length -
-        Math.abs(currentActive - index)
+    $items.length -
+    Math.abs(
+      currentActive - index
+    )
 
 
   item.style.setProperty(
@@ -163,7 +220,7 @@ const animate = () => {
     )
 
 
-  const newActive =
+  active =
     Math.floor(
       progress /
       100 *
@@ -171,12 +228,6 @@ const animate = () => {
     )
 
 
-  active = newActive
-
-
-  /*
-    Update semua card.
-  */
   $items.forEach(
     (item, index) => {
 
@@ -191,8 +242,8 @@ const animate = () => {
 
 
   /*
-    Video hanya diatur kalau
-    card aktif berubah.
+    Hanya HP yang menjalankan
+    optimasi video.
   */
   updateVideos()
 
@@ -200,24 +251,43 @@ const animate = () => {
 
 
 /*--------------------
-Frame Scheduler
+Mobile Frame
 --------------------*/
-const scheduleAnimate = () => {
 
-  if (pendingRender) {
+/*
+  Desktop:
+    animate() langsung seperti original.
+
+  Mobile:
+    animate() maksimal satu kali
+    setiap animation frame.
+*/
+const requestAnimate = () => {
+
+  if (!isMobile) {
+
+    animate()
+
     return
   }
 
-  pendingRender = true
+
+  if (renderPending) {
+    return
+  }
+
+
+  renderPending = true
 
 
   animationFrame =
     requestAnimationFrame(() => {
 
-      pendingRender = false
-      animationFrame = null
+      renderPending = false
 
       animate()
+
+      animationFrame = null
 
     })
 
@@ -228,6 +298,12 @@ const scheduleAnimate = () => {
 Initial
 --------------------*/
 animate()
+
+/*
+  Pastikan video mobile yang dekat
+  dengan card aktif langsung jalan.
+*/
+updateVideos(true)
 
 
 /*--------------------
@@ -240,9 +316,10 @@ $items.forEach((item, i) => {
     (event) => {
 
       /*
-        Jangan anggap swipe sebagai click.
+        Kalau gerakan sebelumnya adalah
+        swipe, jangan dianggap click.
       */
-      if (didDrag) {
+      if (isMobile && didDrag) {
 
         event.preventDefault()
 
@@ -251,13 +328,16 @@ $items.forEach((item, i) => {
       }
 
 
+      /*
+        Rumus ORIGINAL kamu.
+      */
       progress =
         (i / $items.length) *
         100 +
         10
 
 
-      scheduleAnimate()
+      requestAnimate()
 
     }
   )
@@ -270,12 +350,20 @@ Wheel
 --------------------*/
 const handleWheel = e => {
 
-  progress +=
-    e.deltaY *
-    speedWheel
+  const wheelProgress =
+    e.deltaY * speedWheel
 
 
-  scheduleAnimate()
+  progress =
+    progress +
+    wheelProgress
+
+
+  /*
+    Desktop = langsung animate.
+    Mobile = frame optimized.
+  */
+  requestAnimate()
 
 }
 
@@ -283,10 +371,10 @@ const handleWheel = e => {
 /*--------------------
 Mouse / Touch Move
 --------------------*/
-const handleMouseMove = e => {
+const handleMouseMove = (e) => {
 
   /*
-    Cursor desktop.
+    Cursor tetap sama seperti original.
   */
   if (e.type === 'mousemove') {
 
@@ -319,10 +407,11 @@ const handleMouseMove = e => {
 
 
   /*
-    Tandai sebagai drag setelah
-    bergerak sedikit.
+    Hanya mobile yang perlu
+    membedakan swipe dengan click.
   */
   if (
+    isMobile &&
     Math.abs(x - startX) > 5
   ) {
 
@@ -336,17 +425,15 @@ const handleMouseMove = e => {
     speedDrag
 
 
-  progress +=
+  progress =
+    progress +
     mouseProgress
 
 
   startX = x
 
 
-  /*
-    Tidak langsung animate().
-  */
-  scheduleAnimate()
+  requestAnimate()
 
 }
 
@@ -358,7 +445,10 @@ const handleMouseDown = e => {
 
   isDown = true
 
-  didDrag = false
+
+  if (isMobile) {
+    didDrag = false
+  }
 
 
   startX =
@@ -381,13 +471,16 @@ const handleMouseUp = () => {
   isDown = false
 
 
-  /*
-    Biarkan click event selesai dulu.
-  */
-  if (didDrag) {
+  if (isMobile && didDrag) {
 
+    /*
+      Beri sedikit waktu agar event click
+      tidak salah membaca swipe sebagai click.
+    */
     setTimeout(() => {
+
       didDrag = false
+
     }, 100)
 
   }
@@ -398,6 +491,12 @@ const handleMouseUp = () => {
 /*--------------------
 Listeners
 --------------------*/
+
+/*
+  Tetap menggunakan listener asli kamu.
+  Tidak ada listener hamburger/music
+  yang disentuh.
+*/
 
 document.addEventListener(
   'mousewheel',
@@ -460,3 +559,46 @@ document.addEventListener(
     passive: true
   }
 )
+
+
+/*--------------------
+Visibility
+--------------------*/
+
+/*
+  Khusus mobile:
+  kalau tab ditinggalkan, pause video.
+
+  Saat kembali, video sekitar card aktif
+  akan dimainkan lagi.
+
+  Desktop tidak disentuh.
+*/
+if (isMobile) {
+
+  document.addEventListener(
+    'visibilitychange',
+    () => {
+
+      if (document.hidden) {
+
+        $videos.forEach(
+          ({ video }) => {
+
+            video.pause()
+
+          }
+        )
+
+      } else {
+
+        lastVideoActive = -1
+
+        updateVideos(true)
+
+      }
+
+    }
+  )
+
+}

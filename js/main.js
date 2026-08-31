@@ -1,288 +1,118 @@
-/* =========================================================
-   LAURAA - ORIGINAL CAROUSEL
-   MOBILE PERFORMANCE FIX
-   ========================================================= */
-
-/* --------------------
-   Vars
--------------------- */
-
+/*--------------------
+Vars
+--------------------*/
 let progress = 50
 let startX = 0
 let active = 0
 let isDown = false
 
-let animationFrame = null
-let lastVideoActive = -1
-
 /*
-  Kalau user swipe, jangan dianggap sebagai click.
+  Tambahan untuk performance.
+  Tidak mengubah fungsi carousel.
 */
+let animationFrame = null
+let lastAnimatedProgress = progress
 let didDrag = false
-let suppressClickUntil = 0
 
 
-/* --------------------
-   Constants
--------------------- */
-
+/*--------------------
+Constants
+--------------------*/
 const speedWheel = 0.02
 const speedDrag = -0.1
 
-/*
-  Hanya video di sekitar card aktif yang
-  akan diload dan dimainkan.
 
-  2 = aktif + 2 card kiri/kanan.
-  Jadi maksimal sekitar 5 video yang aktif.
+/*--------------------
+Items
+--------------------*/
+const $items = document.querySelectorAll('.carousel-item')
+const $cursors = document.querySelectorAll('.cursor')
+
+
+/*--------------------
+Videos
+--------------------*/
+const $videos = document.querySelectorAll(
+  '.carousel-item video'
+)
+
+/*
+  Berapa card dari posisi aktif yang
+  videonya boleh tetap berjalan.
+
+  Tidak dibuat terlalu kecil supaya
+  video di sekitar card tetap bergerak.
 */
 const VIDEO_RANGE = 2
 
-
-/* --------------------
-   Items
--------------------- */
-
-const $items = Array.from(
-  document.querySelectorAll('.carousel-item')
-)
-
-const $cursors = document.querySelectorAll('.cursor')
-
-const $carousel =
-  document.querySelector('.carousel')
+let lastVideoActive = -1
 
 
-/* --------------------
-   Videos
--------------------- */
-
-const $videos = []
-
-$items.forEach((item) => {
-
-  const video = item.querySelector('video')
-
-  if (!video) return
-
-  const source =
-    video.querySelector('source')
-
-  if (!source) return
-
-  const originalSrc =
-    source.getAttribute('src')
-
-  if (!originalSrc) return
+const updateVideos = () => {
 
   /*
-    Simpan alamat video.
-
-    Kita kosongkan source setelah main.js
-    dijalankan supaya browser tidak berusaha
-    memainkan semua video sekaligus.
+    Kalau tidak ada video, langsung selesai.
   */
-  video.dataset.originalSrc = originalSrc
-
-  video.autoplay = false
-  video.removeAttribute('autoplay')
-
-  video.loop = true
-  video.muted = true
-  video.defaultMuted = true
-  video.playsInline = true
-
-  video.setAttribute('muted', '')
-  video.setAttribute('playsinline', '')
+  if (!$videos.length) return
 
   /*
-    Metadata saja.
+    Tidak perlu menjalankan fungsi ini
+    kalau active belum berubah.
   */
-  video.preload = 'metadata'
-
-  $videos.push({
-    video: video,
-    source: source,
-    src: originalSrc,
-    loaded: false
-  })
-
-})
-
-
-/* =========================================================
-   VIDEO FUNCTIONS
-========================================================= */
-
-function findVideoData(video) {
-
-  for (let i = 0; i < $videos.length; i++) {
-
-    if ($videos[i].video === video) {
-      return $videos[i]
-    }
-
-  }
-
-  return null
-}
-
-
-/*
-  Load satu video.
-*/
-function loadVideo(data) {
-
-  if (!data) return
-
-  const video = data.video
-
-  /*
-    Kalau source sudah ada, tidak perlu
-    dimasukkan lagi.
-  */
-  if (
-    data.loaded &&
-    video.getAttribute('src')
-  ) {
-    return
-  }
-
-  data.source.setAttribute(
-    'src',
-    data.src
-  )
-
-  data.loaded = true
-
-  try {
-    video.load()
-  } catch (error) {
-    console.warn(
-      'Video load error:',
-      error
-    )
-  }
-
-}
-
-
-/*
-  Play satu video.
-
-  play() di HP bisa menghasilkan Promise
-  rejection. Kita tangkap supaya tidak
-  menghentikan JavaScript carousel.
-*/
-function playVideo(data) {
-
-  if (!data) return
-
-  const video = data.video
-
-  video.muted = true
-  video.defaultMuted = true
-  video.playsInline = true
-
-  const promise = video.play()
-
-  if (
-    promise &&
-    typeof promise.catch === 'function'
-  ) {
-
-    promise.catch(() => {})
-
-  }
-
-}
-
-
-/*
-  Pause + unload video yang sudah jauh
-  dari card aktif.
-*/
-function unloadVideo(data) {
-
-  if (!data) return
-
-  const video = data.video
-
-  try {
-    video.pause()
-  } catch (error) {}
-
-  /*
-    Hapus source supaya browser tidak terus
-    menyimpan decoder/video resource.
-  */
-  data.source.removeAttribute('src')
-
-  data.loaded = false
-
-  try {
-    video.load()
-  } catch (error) {}
-
-}
-
-
-/*
-  Atur video berdasarkan posisi carousel.
-*/
-function updateVideos(force = false) {
-
-  if (
-    !force &&
-    active === lastVideoActive
-  ) {
-    return
-  }
+  if (active === lastVideoActive) return
 
   lastVideoActive = active
 
 
-  $videos.forEach((data) => {
+  $items.forEach((item, index) => {
 
-    const itemIndex =
-      $items.indexOf(data.video.closest('.carousel-item'))
+    const video = item.querySelector('video')
 
-    if (itemIndex === -1) return
+    if (!video) return
+
 
     const distance =
-      Math.abs(itemIndex - active)
+      Math.abs(index - active)
+
 
     if (distance <= VIDEO_RANGE) {
 
       /*
-        Video dekat card aktif:
-        load.
+        Video dekat card aktif tetap berjalan.
       */
-      loadVideo(data)
+
+      video.muted = true
+      video.defaultMuted = true
+      video.playsInline = true
 
       /*
-        Yang aktif benar-benar dimainkan.
+        Browser mobile kadang menolak play().
+        Jangan sampai error tersebut
+        menghentikan main.js.
       */
-      if (distance === 0) {
-        playVideo(data)
-      }
+      const playPromise = video.play()
 
-      /*
-        Card sekitar aktif juga boleh bergerak.
-        Ini supaya ketika card terlihat di
-        samping, videonya tidak mendadak diam.
-      */
-      else {
-        playVideo(data)
+      if (
+        playPromise &&
+        typeof playPromise.catch === 'function'
+      ) {
+        playPromise.catch(() => {})
       }
 
     } else {
 
       /*
-        Video jauh:
-        pause + unload.
+        Hanya PAUSE.
+        
+        Jangan hapus src.
+        Jangan video.load().
+        Jangan reload video.
+
+        Jadi ketika card kembali aktif,
+        video bisa lanjut tanpa memaksa
+        download ulang.
       */
-      unloadVideo(data)
+      video.pause()
 
     }
 
@@ -291,42 +121,49 @@ function updateVideos(force = false) {
 }
 
 
-/* =========================================================
-   Z-INDEX
-========================================================= */
+/*--------------------
+Get Z
+--------------------*/
 
-const getZindex = (
-  arrayLength,
-  index,
-  activeIndex
-) => {
+/*
+  Versi lama kamu membuat array/map
+  baru setiap kali card dihitung.
 
-  return (
-    index === activeIndex
-      ? arrayLength
-      : arrayLength -
-        Math.abs(activeIndex - index)
-  )
+  Dengan 61 card, itu cukup boros.
+
+  Rumus hasilnya TETAP SAMA.
+*/
+const getZindex = (array, index) => {
+
+  return array.map((_, i) => {
+
+    return (
+      index === i
+        ? array.length
+        : array.length -
+          Math.abs(index - i)
+    )
+
+  })
 
 }
 
 
-/* =========================================================
-   DISPLAY
-========================================================= */
-
+/*--------------------
+Display Items
+--------------------*/
 const displayItems = (
   item,
   index,
   currentActive
 ) => {
 
+  /*
+    Hasil tetap sama seperti original.
+  */
   const zIndex =
-    getZindex(
-      $items.length,
-      index,
-      currentActive
-    )
+    $items.length -
+    Math.abs(currentActive - index)
 
   item.style.setProperty(
     '--zIndex',
@@ -342,10 +179,9 @@ const displayItems = (
 }
 
 
-/* =========================================================
-   ANIMATE
-========================================================= */
-
+/*--------------------
+Animate
+--------------------*/
 const animate = () => {
 
   progress =
@@ -355,7 +191,7 @@ const animate = () => {
     )
 
 
-  const newActive =
+  active =
     Math.floor(
       progress /
       100 *
@@ -363,13 +199,8 @@ const animate = () => {
     )
 
 
-  active = newActive
-
-
   /*
-    Update 61 card.
-    Ini tetap sama konsepnya dengan
-    JavaScript original kamu.
+    Tetap update SEMUA card seperti original.
   */
   $items.forEach(
     (item, index) => {
@@ -385,7 +216,7 @@ const animate = () => {
 
 
   /*
-    Video hanya diperiksa kalau active
+    Atur video hanya ketika active
     card berubah.
   */
   updateVideos()
@@ -393,20 +224,58 @@ const animate = () => {
 }
 
 
-/* =========================================================
-   REQUEST ANIMATION FRAME
-========================================================= */
+/*--------------------
+Smooth Animate
+--------------------*/
 
-function requestAnimate() {
+/*
+  Ini bagian PALING PENTING.
+
+  Original kamu:
+
+      touchmove
+          ↓
+      animate()
+          ↓
+      61 card dihitung
+
+  berkali-kali dalam satu detik.
+
+  Sekarang:
+
+      touchmove
+          ↓
+      requestAnimationFrame
+          ↓
+      animate() maksimal 1x/frame
+*/
+
+const requestAnimate = () => {
 
   if (animationFrame !== null) {
     return
   }
 
+
   animationFrame =
     requestAnimationFrame(() => {
 
       animationFrame = null
+
+      /*
+        Tidak ada perubahan berarti,
+        tidak perlu render ulang.
+      */
+      if (
+        progress === lastAnimatedProgress
+      ) {
+        return
+      }
+
+
+      lastAnimatedProgress =
+        progress
+
 
       animate()
 
@@ -415,23 +284,15 @@ function requestAnimate() {
 }
 
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
+/*
+  Initial render.
+*/
 animate()
 
-/*
-  Setelah posisi awal ditentukan,
-  atur video yang boleh aktif.
-*/
-updateVideos(true)
 
-
-/* =========================================================
-   CLICK ON ITEMS
-========================================================= */
-
+/*--------------------
+Click on Items
+--------------------*/
 $items.forEach((item, i) => {
 
   item.addEventListener(
@@ -439,26 +300,25 @@ $items.forEach((item, i) => {
     (event) => {
 
       /*
-        Kalau barusan swipe,
-        jangan dianggap klik.
+        Kalau user sebenarnya sedang swipe,
+        jangan perlakukan sebagai click.
       */
-      if (
-        didDrag ||
-        performance.now() <
-        suppressClickUntil
-      ) {
+      if (didDrag) {
 
         event.preventDefault()
-        event.stopPropagation()
+
+        /*
+          Reset sebentar setelah event click.
+        */
+        setTimeout(() => {
+          didDrag = false
+        }, 50)
 
         return
+
       }
 
 
-      /*
-        Rumus posisi tetap mengikuti
-        JavaScript asli kamu.
-      */
       progress =
         (i / $items.length) *
         100 +
@@ -467,57 +327,25 @@ $items.forEach((item, i) => {
 
       requestAnimate()
 
-
-      /*
-        Kalau card tersebut memiliki video,
-        langsung play setelah menjadi aktif.
-      */
-      const video =
-        item.querySelector('video')
-
-      if (video) {
-
-        const data =
-          findVideoData(video)
-
-        if (data) {
-
-          loadVideo(data)
-          playVideo(data)
-
-        }
-
-      }
-
     }
   )
 
 })
 
 
-/* =========================================================
-   MOUSE WHEEL
-========================================================= */
+/*--------------------
+Handlers
+--------------------*/
 
-function handleWheel(e) {
-
-  /*
-    Hanya proses wheel kalau memang
-    terjadi pada carousel.
-  */
-  if (
-    $carousel &&
-    !e.target.closest('.carousel-item')
-  ) {
-    return
-  }
-
+const handleWheel = e => {
 
   const wheelProgress =
     e.deltaY * speedWheel
 
 
-  progress += wheelProgress
+  progress =
+    progress +
+    wheelProgress
 
 
   requestAnimate()
@@ -525,103 +353,49 @@ function handleWheel(e) {
 }
 
 
-if ($carousel) {
+/*--------------------
+Mouse Move
+--------------------*/
 
-  $carousel.addEventListener(
-    'wheel',
-    handleWheel,
-    {
-      passive: true
-    }
-  )
-
-}
-
-
-/* =========================================================
-   POINTER / TOUCH
-========================================================= */
-
-function getPointerX(e) {
-
-  return e.clientX || 0
-
-}
-
-
-/*
-  Pointer down
-*/
-function handlePointerDown(e) {
+const handleMouseMove = (e) => {
 
   /*
-    Abaikan kalau bukan berasal dari card.
+    Cursor tetap SAMA seperti original.
   */
-  if (
-    !$carousel ||
-    !e.target.closest('.carousel-item')
-  ) {
-    return
+  if (e.type === 'mousemove') {
+
+    $cursors.forEach(($cursor) => {
+
+      $cursor.style.transform =
+        `translate(
+          ${e.clientX}px,
+          ${e.clientY}px
+        )`
+
+    })
+
   }
 
-
-  /*
-    Mouse hanya tombol kiri.
-  */
-  if (
-    e.pointerType === 'mouse' &&
-    e.button !== 0
-  ) {
-    return
-  }
-
-
-  isDown = true
-
-  didDrag = false
-
-  startX =
-    getPointerX(e)
-
-
-  /*
-    Simpan pointer capture di carousel
-    supaya swipe tetap terdeteksi meskipun
-    jari keluar sedikit dari card.
-  */
-  try {
-
-    $carousel.setPointerCapture(
-      e.pointerId
-    )
-
-  } catch (error) {}
-
-}
-
-
-/*
-  Pointer move
-*/
-function handlePointerMove(e) {
 
   if (!isDown) return
 
 
   const x =
-    getPointerX(e)
-
-
-  const distance =
-    x - startX
+    e.clientX ||
+    (
+      e.touches &&
+      e.touches[0] &&
+      e.touches[0].clientX
+    ) ||
+    0
 
 
   /*
-    Kalau bergerak lebih dari 6px,
-    anggap sebagai swipe/drag.
+    Kalau bergerak lebih dari sedikit,
+    tandai sebagai drag/swipe.
   */
   if (
-    Math.abs(distance) > 6
+    Math.abs(x - startX) > 5
   ) {
 
     didDrag = true
@@ -629,14 +403,14 @@ function handlePointerMove(e) {
   }
 
 
-  /*
-    Persis seperti rumus original:
-  */
   const mouseProgress =
-    distance * speedDrag
+    (x - startX) *
+    speedDrag
 
 
-  progress += mouseProgress
+  progress =
+    progress +
+    mouseProgress
 
 
   startX = x
@@ -644,223 +418,132 @@ function handlePointerMove(e) {
 
   /*
     JANGAN langsung animate().
-
-    Gunakan requestAnimationFrame supaya
-    100 event touch tidak menghasilkan
-    100 render berturut-turut.
+    Ini yang membuat HP lebih ringan.
   */
   requestAnimate()
 
 }
 
 
-/*
-  Pointer up
-*/
-function handlePointerUp(e) {
+/*--------------------
+Mouse Down
+--------------------*/
 
-  if (!isDown) return
+const handleMouseDown = e => {
+
+  isDown = true
+
+  didDrag = false
+
+
+  startX =
+    e.clientX ||
+    (
+      e.touches &&
+      e.touches[0] &&
+      e.touches[0].clientX
+    ) ||
+    0
+
+}
+
+
+/*--------------------
+Mouse Up
+--------------------*/
+
+const handleMouseUp = () => {
 
   isDown = false
 
-
-  try {
-
-    $carousel.releasePointerCapture(
-      e.pointerId
-    )
-
-  } catch (error) {}
-
-
   /*
-    Kalau tadi swipe, blok click sebentar.
+    Kalau bukan drag, biarkan click bekerja.
   */
-  if (didDrag) {
-
-    suppressClickUntil =
-      performance.now() + 250
-
+  if (!didDrag) {
+    return
   }
 
-
   /*
-    Reset setelah click event selesai.
+    Jangan langsung reset supaya
+    click event tidak salah membaca swipe
+    sebagai klik card.
   */
   setTimeout(() => {
 
     didDrag = false
 
-  }, 300)
+  }, 100)
 
 }
 
+
+/*--------------------
+Listeners
+--------------------*/
 
 /*
-  Pointer cancel
-*/
-function handlePointerCancel(e) {
-
-  isDown = false
-
-  didDrag = true
-
-  suppressClickUntil =
-    performance.now() + 250
-
-
-  try {
-
-    $carousel.releasePointerCapture(
-      e.pointerId
-    )
-
-  } catch (error) {}
-
-}
-
-
-/* =========================================================
-   POINTER LISTENERS
-========================================================= */
-
-if ($carousel) {
-
-  $carousel.addEventListener(
-    'pointerdown',
-    handlePointerDown,
-    {
-      passive: true
-    }
-  )
-
-
-  $carousel.addEventListener(
-    'pointermove',
-    handlePointerMove,
-    {
-      passive: true
-    }
-  )
-
-
-  $carousel.addEventListener(
-    'pointerup',
-    handlePointerUp,
-    {
-      passive: true
-    }
-  )
-
-
-  $carousel.addEventListener(
-    'pointercancel',
-    handlePointerCancel,
-    {
-      passive: true
-    }
-  )
-
-}
-
-
-/* =========================================================
-   DESKTOP CURSOR
-========================================================= */
-
-if ($cursors.length) {
-
-  document.addEventListener(
-    'pointermove',
-    (e) => {
-
-      /*
-        Cursor hanya diperlukan untuk mouse.
-      */
-      if (
-        e.pointerType &&
-        e.pointerType !== 'mouse'
-      ) {
-        return
-      }
-
-
-      $cursors.forEach(
-        ($cursor) => {
-
-          $cursor.style.transform =
-            `translate(
-              ${e.clientX}px,
-              ${e.clientY}px
-            )`
-
-        }
-      )
-
-    },
-    {
-      passive: true
-    }
-  )
-
-}
-
-
-/* =========================================================
-   VISIBILITY
-========================================================= */
-
-/*
-  Kalau user pindah tab,
-  pause semua video.
-
-  Saat kembali, video yang dekat card aktif
-  akan dimainkan lagi.
+  Tetap memakai listener ASLI kamu.
+  Jadi tidak menyentuh hamburger/menu.
 */
 
 document.addEventListener(
-  'visibilitychange',
-  () => {
-
-    if (document.hidden) {
-
-      $videos.forEach(
-        (data) => {
-
-          try {
-            data.video.pause()
-          } catch (error) {}
-
-        }
-      )
-
-    } else {
-
-      updateVideos(true)
-
-    }
-
+  'mousewheel',
+  handleWheel,
+  {
+    passive: true
   }
 )
 
 
-/* =========================================================
-   PAGE EXIT
-========================================================= */
+document.addEventListener(
+  'mousedown',
+  handleMouseDown,
+  {
+    passive: true
+  }
+)
 
-window.addEventListener(
-  'pagehide',
-  () => {
 
-    $videos.forEach(
-      (data) => {
+document.addEventListener(
+  'mousemove',
+  handleMouseMove,
+  {
+    passive: true
+  }
+)
 
-        try {
-          data.video.pause()
-        } catch (error) {}
 
-      }
-    )
+document.addEventListener(
+  'mouseup',
+  handleMouseUp,
+  {
+    passive: true
+  }
+)
 
+
+document.addEventListener(
+  'touchstart',
+  handleMouseDown,
+  {
+    passive: true
+  }
+)
+
+
+document.addEventListener(
+  'touchmove',
+  handleMouseMove,
+  {
+    passive: true
+  }
+)
+
+
+document.addEventListener(
+  'touchend',
+  handleMouseUp,
+  {
+    passive: true
   }
 )

@@ -6,11 +6,15 @@
     <title>LAURAA</title>
     <link rel="stylesheet" href="style/style.css" />
     <style>
-      body {
+      html, body {
         margin: 0;
         padding: 0;
+        width: 100%;
+        height: 100%;
         overflow: hidden;
+        position: fixed;
         background: #000; /* Background gelap */
+        touch-action: none; /* Cegah browser scroll saat swipe carousel */
       }
       canvas {
         position: fixed;
@@ -22,15 +26,27 @@
   </head>
   <body>
     <canvas id="c"></canvas>
-    <div class="button-wrapper">
+    <button class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <div class="button-wrapper" id="sidebar">
       <button class="play-button" id="toggleMusic">Play</button>
       <audio id="bgm" src="/img/abtyou.mp3" preload="auto"></audio>
 
       <div class="go-to">
-        <a href="page/page1.html">Memories</a>
+        <a href="page/page1.html">ILY</a>
       </div>
       <div class="go-to">
         <a href="page/page2.html">Fav Person</a>
+      </div>
+      <div class="go-to">
+        <a href="page/page3.html">Journey</a>
+      </div>
+      <div class="go-to">
+        <a href="page/page4.html">100 Reasons</a>
       </div>
     </div>
 
@@ -47,139 +63,96 @@
           button.textContent = "Play";
         }
       });
+      const hamburger = document.getElementById("hamburger");
+      const sidebar = document.getElementById("sidebar");
+
+      hamburger.addEventListener("click", () => {
+        sidebar.classList.toggle("active");
+        hamburger.classList.toggle("active");
+      });
     </script>
 
     <div class="carousel">
-
       <div class="carousel-item">
         <div class="carousel-box">
           <img src="img/first.png" />
         </div>
       </div>
 
+      
+
+      
 
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">🥰</div>
-          <img src="img/gambar1.jpg" />
+          <div class="title">😽</div>
           <div class="num">01</div>
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😎</div>
-          <img src="img/gambar2.jpg" />
-          <div class="num">02</div>
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🥰</div>
-          <div class="num">03</div>
-          <video autoplay loop muted playsinline>
-            <source src="img/vid3.mp4" type="video/mp4" />
-          </video>
+          <img src="img/gambar48.jpeg" />
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
           <div class="title">😍</div>
+          <div class="num">02</div>
+          <img src="img/gambar45.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🤪</div>
+          <div class="num">03</div>
+          <img src="img/gambar40.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">💗</div>
           <div class="num">04</div>
+          <img src="img/gambar36.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😍</div>
+          <div class="num">05</div>
           <img src="img/gambar4.jpg" />
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">💯</div>
-          <div class="num">05</div>
-          <img src="img/gambar3.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🎀</div>
+          <div class="title">🥰</div>
           <div class="num">06</div>
-          <img src="img/gambar6.jpg" />
+          <img src="img/gambar44.jpeg" />
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">🫡</div>
+          <div class="title">☺️</div>
           <div class="num">07</div>
-          <video autoplay loop muted playsinline>
-            <source src="img/vid4.mp4" type="video/mp4" />
-          </video>
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😇</div>
-          <div class="num">08</div>
-          <img src="img/gambar8.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🤩</div>
-          <div class="num">09</div>
-          <img src="img/gambar9.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🤗</div>
-          <div class="num">10</div>
-          <img src="img/gambar11.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😌</div>
-          <div class="num">11</div>
-          <video autoplay loop muted playsinline>
-            <source src="img/vid5.mp4" type="video/mp4" />
-          </video>
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😖</div>
-          <div class="num">12</div>
-          <img src="img/gambar12.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😌</div>
-          <div class="num">13</div>
-          <img src="img/gambar13.jpg" />
+          <img src="img/gambar29.jpg" />
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
           <div class="title">😝</div>
-          <div class="num">14</div>
-          <img src="img/gambar14.jpg" />
+          <div class="num">08</div>
+          <video autoplay loop muted playsinline>
+            <source src="img/vid9.mp4" type="video/mp4" />
+          </video>
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
           <div class="title">😭</div>
-          <div class="num">15</div>
+          <div class="num">09</div>
           <video autoplay loop muted playsinline>
             <source src="img/vid6.mp4" type="video/mp4" />
           </video>
@@ -188,9 +161,59 @@
 
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">🎁</div>
+          <div class="title">💖</div>
+          <div class="num">10</div>
+          <img src="img/gambar43.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😫</div>
+          <div class="num">11</div>
+          <video autoplay loop muted playsinline>
+            <source src="img/vid10.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😋</div>
+          <div class="num">12</div>
+          <img src="img/gambar38.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😝</div>
+          <div class="num">13</div>
+          <img src="img/gambar18.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😖</div>
+          <div class="num">14</div>
+          <img src="img/gambar12.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😇</div>
+          <div class="num">15</div>
+          <img src="img/gambar8.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🥰</div>
           <div class="num">16</div>
-          <img src="img/gambar16.jpg" />
+          <img src="img/gambar27.jpg" />
         </div>
       </div>
 
@@ -198,88 +221,106 @@
         <div class="carousel-box">
           <div class="title">🥺</div>
           <div class="num">17</div>
-          <img src="img/gambar17.jpg" />
+          <img src="img/gambar49.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😍</div>
+          <div class="num">18</div>
+          <img src="img/gambar47.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">💖</div>
+          <div class="num">19</div>
+          <img src="img/gambar46.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🥰</div>
+          <div class="num">20</div>
+          <img src="img/gambar1.jpg" />
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
           <div class="title">😝</div>
-          <div class="num">18</div>
-          <img src="img/gambar18.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😉</div>
-          <div class="num">19</div>
-          <img src="img/gambar19.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😚</div>
-          <div class="num">20</div>
-          <img src="img/gambar20.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🥺</div>
           <div class="num">21</div>
-          <img src="img/gambar21.jpg" />
+          <img src="img/gambar14.jpg" />
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">😽</div>
-          <div class="num">21</div>
+          <div class="title">😌</div>
+          <div class="num">22</div>
           <video autoplay loop muted playsinline>
-            <source src="img/vid2.mp4" type="video/mp4" />
+            <source src="img/vid5.mp4" type="video/mp4" />
           </video>
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">💞</div>
-          <div class="num">22</div>
-          <img src="img/gambar5.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😗</div>
-          <div class="num">23</div>
-          <img src="img/gambar7.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😎</div>
-          <div class="num">24</div>
-          <img src="img/gambar22.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
           <div class="title">😩</div>
-          <div class="num">25</div>
+          <div class="num">23</div>
           <img src="img/gambar23.jpg" />
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">😦</div>
+          <div class="title">🥹</div>
+          <div class="num">24</div>
+          <img src="img/gambar28.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🫣</div>
+          <div class="num">25</div>
+          <img src="img/gambar24.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🎀</div>
           <div class="num">26</div>
+          <img src="img/gambar6.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🫢</div>
+          <div class="num">27</div>
+          <video autoplay loop muted playsinline>
+            <source src="img/vid8.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😚</div>
+          <div class="num">28</div>
+          <img src="img/gambar20.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😦</div>
+          <div class="num">29</div>
           <video autoplay loop muted playsinline>
             <source src="img/vid7.mp4" type="video/mp4" />
           </video>
@@ -288,125 +329,255 @@
 
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">🫣</div>
-          <div class="num">27</div>
-          <img src="img/gambar24.jpg" />
-        </div>
-      </div>
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🫣</div>
-          <div class="num">28</div>
-          <img src="img/gambar25.jpg" />
+          <div class="title">💕</div>
+          <div class="num">30</div>
+          <video autoplay loop muted playsinline>
+            <source src="img/vid11.mp4" type="video/mp4" />
+          </video>
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
           <div class="title">🤨</div>
-          <div class="num">29</div>
+          <div class="num">31</div>
           <img src="img/gambar26.jpg" />
         </div>
       </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">🫢</div>
-          <div class="num">30</div>
-          <video autoplay loop muted playsinline>
-            <source src="img/vid8.mp4" type="video/mp4" />
-          </video>
-        </div>
-      </div>
-
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🥰</div>
-          <div class="num">31</div>
-          <img src="img/gambar27.jpg" />
-        </div>
-      </div>
-
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🥹</div>
+          <div class="title">😻</div>
           <div class="num">32</div>
-          <img src="img/gambar28.jpg" />
+          <img src="img/gambar35.jpg" />
         </div>
       </div>
 
-
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">☺️</div>
+          <div class="title">😌</div>
           <div class="num">33</div>
-          <img src="img/gambar29.jpg" />
+          <img src="img/gambar13.jpg" />
         </div>
       </div>
-
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">😝</div>
-          <div class="num">34</div>
-          <video autoplay loop muted playsinline>
-            <source src="img/vid9.mp4" type="video/mp4" />
-          </video>
-        </div>
-      </div>
-
-      
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🤯</div>
-          <div class="num">34</div>
-          <img src="img/gambar30.jpg" />
-        </div>
-      </div>
-
-
-      <div class="carousel-item">
-        <div class="carousel-box">
-          <div class="title">🙏</div>
-          <div class="num">35</div>
-          <img src="img/gambar31.jpg" />
-        </div>
-      </div>
-
-
 
       <div class="carousel-item">
         <div class="carousel-box">
           <div class="title">😜</div>
-          <div class="num">36</div>
+          <div class="num">34</div>
           <img src="img/gambar32.jpg" />
         </div>
       </div>
 
-
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">😘</div>
-          <div class="num">37</div>
-          <img src="img/gambar33.jpg" />
+          <div class="title">🤤</div>
+          <div class="num">35</div>
+          <img src="img/gambar39.jpeg" />
         </div>
       </div>
 
-
       <div class="carousel-item">
         <div class="carousel-box">
-          <div class="title">😫</div>
-          <div class="num">38</div>
+          <div class="title">😽</div>
+          <div class="num">36</div>
           <video autoplay loop muted playsinline>
-            <source src="img/vid10.mp4" type="video/mp4" />
+            <source src="img/vid2.mp4" type="video/mp4" />
           </video>
         </div>
       </div>
 
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🤩</div>
+          <div class="num">37</div>
+          <img src="img/gambar9.jpg" />
+        </div>
+      </div>
 
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🥰</div>
+          <div class="num">38</div>
+          <video autoplay loop muted playsinline>
+            <source src="img/vid3.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🤗</div>
+          <div class="num">39</div>
+          <img src="img/gambar11.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😘</div>
+          <div class="num">40</div>
+          <video autoplay loop muted playsinline>
+            <source src="img/vid13.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🫣</div>
+          <div class="num">41</div>
+          <img src="img/gambar25.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">💞</div>
+          <div class="num">42</div>
+          <img src="img/gambar5.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😗</div>
+          <div class="num">43</div>
+          <img src="img/gambar7.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🎁</div>
+          <div class="num">44</div>
+          <img src="img/gambar16.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">💯</div>
+          <div class="num">45</div>
+          <img src="img/gambar3.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😎</div>
+          <div class="num">46</div>
+          <img src="img/gambar22.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🫡</div>
+          <div class="num">47</div>
+          <video autoplay loop muted playsinline>
+            <source src="img/vid4.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🤭</div>
+          <div class="num">48</div>
+          <img src="img/gambar37.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😎</div>
+          <div class="num">49</div>
+          <img src="img/gambar2.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🥺</div>
+          <div class="num">50</div>
+          <img src="img/gambar17.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🤯</div>
+          <div class="num">51</div>
+          <img src="img/gambar30.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🥺</div>
+          <div class="num">52</div>
+          <img src="img/gambar21.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🥰</div>
+          <div class="num">53</div>
+          <video autoplay loop muted playsinline>
+            <source src="img/vid12.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🙏</div>
+          <div class="num">54</div>
+          <img src="img/gambar31.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😘</div>
+          <div class="num">55</div>
+          <img src="img/gambar33.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😉</div>
+          <div class="num">56</div>
+          <img src="img/gambar19.jpg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🤭</div>
+          <div class="num">57</div>
+          <img src="img/gambar41.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">🫣</div>
+          <div class="num">58</div>
+          <img src="img/gambar42.jpeg" />
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="carousel-box">
+          <div class="title">😶‍🌫️</div>
+          <div class="num">59</div>
+          <img src="img/gambar34.jpeg" />
+        </div>
+      </div>
 
       <div class="carousel-item">
         <div class="carousel-box">
@@ -449,9 +620,6 @@
         FOR: CINDY LAURA
       </div>
     </div>
-
-
-
 
     <svg style="display: none">
       <!-- ikon sosial -->

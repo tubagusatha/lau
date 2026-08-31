@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>100 Reasons Why I Love You</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Caveat:wght@700&display=swap" rel="stylesheet" />
+  
+  <style>
+    :root {
+      --bg-color: #0b0914;
+      --accent: #ff477e;
+      --card-bg: rgba(22, 17, 36, 0.85);
+    }
+    
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100vh;
+      background: var(--bg-color);
+      font-family: 'Montserrat', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at top right, rgba(255, 71, 126, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(255, 71, 126, 0.1) 0%, transparent 40%);
+    }
+
+    /* Navbar/Controls */
+    .controls {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+    
+    .controls > * {
+      pointer-events: auto;
+    }
+
+    .btn {
+      text-decoration: none;
+      border-radius: 50px;
+      padding: 12px 24px;
+      color: #fff;
+      font-weight: 700;
+      background: rgba(255, 71, 126, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 71, 126, 0.5);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      font-family: "Montserrat", sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    
+    .btn:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255, 71, 126, 0.5);
+    }
+
+    /* Header */
+    .header-container {
+      text-align: center;
+      padding: 100px 20px 40px;
+    }
+    
+    h1 {
+      font-size: clamp(30px, 6vw, 60px);
+      margin: 0;
+      font-weight: 900;
+      color: #ffb3c6;
+      text-shadow: 0 0 15px rgba(255, 71, 126, 0.5);
+    }
+    
+    p.subtitle {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(20px, 4vw, 35px);
+      color: #e0e0e0;
+      margin-top: 10px;
+      letter-spacing: 1px;
+    }
+
+    /* Grid Layout - Make it less rigid */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 25px;
+      padding: 0 5vw 100px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    
+    /* 3D Flip Card */
+    .scene {
+      width: 100%;
+      aspect-ratio: 3 / 4; /* Portrait like a real card/polaroid */
+      perspective: 800px;
+      cursor: pointer;
+      /* The random rotation makes it look natural and scattered */
+      transform: rotate(var(--rot, 0deg));
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0s;
+      z-index: 1;
+    }
+
+    .scene:hover {
+      transform: rotate(0deg) scale(1.15) translateY(-5px);
+      z-index: 10;
+    }
+    
+    .scene.active-flip {
+      z-index: 20;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-style: preserve-3d;
+    }
+    
+    .card.is-flipped {
+      transform: rotateY(180deg);
+    }
+    
+    .card__face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 15px;
+      box-sizing: border-box;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    }
+    
+    /* Front of card (Number) */
+    .card__face--front {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 71, 126, 0.4);
+      backdrop-filter: blur(8px);
+      font-size: clamp(30px, 5vw, 45px);
+      font-family: 'Caveat', cursive; /* Hand-written style */
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255, 71, 126, 0.8);
+      background-image: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    }
+    
+    .scene:hover .card__face--front {
+      background: rgba(255, 71, 126, 0.15);
+      border-color: rgba(255, 71, 126, 0.8);
+    }
+
+    /* Back of card (Reason) */
+    .card__face--back {
+      background: linear-gradient(135deg, #ff477e, #b5179e);
+      transform: rotateY(180deg);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 25px rgba(255, 71, 126, 0.5), inset 0 0 15px rgba(0,0,0,0.2);
+      font-family: 'Caveat', cursive; /* Makes it look like a hand-written note */
+      font-size: clamp(16px, 1.8vw, 22px);
+      font-weight: 700;
+      line-height: 1.3;
+      color: #fff;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .card__face--back::-webkit-scrollbar {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .btn {
+        padding: 12px 20px;
+        font-size: 11px;
+      }
+      .grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 15px;
+        padding: 0 20px 80px;
+      }
+      .card__face--back {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio -->
+  <audio id="bgm" src="/img/you.mp3" preload="auto" loop></audio>
+
+  <!-- Navbar -->
+  <div class="controls">
+    <button class="btn" id="toggleMusic">Play Music</button>
+    <a href="../index.html" class="btn">Kembali</a>
+  </div>
+
+  <div class="header-container">
+    <h1>100 Reasons</h1>
+    <p class="subtitle">Kenapa aku sayang banget sama kamu...</p>
+  </div>
+
+  <!-- Grid of Cards -->
+  <div class="grid-container" id="grid"></div>
+
+  <!-- Script to generate 100 cards -->
+  <script>
+    // Music toggle
+    const audio = document.getElementById("bgm");
+    const btnMusic = document.getElementById("toggleMusic");
+    
+    btnMusic.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        btnMusic.textContent = "Pause Music";
+      } else {
+        audio.pause();
+        btnMusic.textContent = "Play Music";
+      }
+    });
+
+    // 100 Reasons Array
+    const reasons = [
+      "Karena senyum kamu sukses bikin aku salting.",
+      "Karena kamu sabar banget ngadepin aku yang ngeselin.",
+      "Karena sama kamu, hal kecil jadi kerasa spesial.",
+      "Karena kamu ngerti jokes receh aku.",
+      "Karena cara ketawa kamu itu nular banget.",
+      "Karena kamu selalu ada buat dengerin ceritaku.",
+      "Karena mata kamu indah banget kalau lagi natap aku.",
+      "Karena kamu bikin aku pengen jadi versi terbaik dari diriku.",
+      "Karena sifat manja kamu bikin aku selalu pengen jagain kamu.",
+      "Karena deket kamu bawaannya tenang terus.",
+      "Karena kamu selalu support apapun yang aku lakuin.",
+      "Karena ngeliat kamu seneng aja udah bikin aku bahagia.",
+      "Karena kamu cantik dari luar maupun dari dalam.",
+      "Karena kamu bikin hari-hariku yang berat jadi ringan.",
+      "Karena suara kamu jadi melodi favoritku.",
+      "Karena kamu nggak pernah nyerah sama hubungan kita.",
+      "Karena lucunya kamu kalau lagi ngambek.",
+      "Karena kamu kasih aku alasan buat terus tersenyum tiap hari.",
+      "Karena kita bisa ngomongin hal random sampai larut malam.",
+      "Karena nyaman banget bisa jadi diri sendiri di depan kamu.",
+      "Karena kamu care banget sama hal-hal kecil tentangku.",
+      "Karena masakan/perhatian kamu selalu bikin kangen.",
+      "Karena pelukan virtualmu kerasa nyata di hati.",
+      "Karena kita selalu punya cara buat baikan habis berantem.",
+      "Karena kamu bikin aku ngerasa dihargai.",
+      "Karena cuma kamu yang tau cara bikin aku tenang saat panik.",
+      "Karena tiap notif dari kamu bikin moodku naik.",
+      "Karena kita saling melengkapi satu sama lain.",
+      "Karena kamu orang pertama yang pengen aku ajak cerita.",
+      "Karena nama kamu selalu ada di doa-doaku.",
+      "Karena kamu nggak pernah malu buat bilang 'I love you'.",
+      "Karena kamu punya hati yang super lembut.",
+      "Karena jujur aja, kamu gemesin banget!",
+      "Karena kamu bikin aku sadar kalau cinta itu nggak rumit.",
+      "Karena ketulusan kamu bikin aku jatuh cinta berkali-kali.",
+      "Karena kamu nemenin aku dari nol.",
+      "Karena sama kamu, LDR nggak kerasa seberat itu.",
+      "Karena tiap ngebayangin masa depan, pasti ada kamu.",
+      "Karena kamu nerima semua kurang dan lebihku.",
+      "Karena kamu selalu berusaha ngasih yang terbaik buat kita.",
+      "Karena kamu nggak pernah lupa ngingetin aku makan/istirahat.",
+      "Karena denger kamu cerita panjang lebar itu asik banget.",
+      "Karena kamu tetep keliatan cantik walaupun lagi baru bangun tidur.",
+      "Karena kamu ngasih aku warna baru di hidupku.",
+      "Karena kita bisa diem-dieman tapi tetep ngerasa nyaman.",
+      "Karena keisengan kamu bikin hidup nggak membosankan.",
+      "Karena kamu nggak gengsi buat minta maaf duluan.",
+      "Karena aku suka cara kamu natep aku pas lagi vidcall.",
+      "Karena kamu selalu bangga milikin aku.",
+      "Karena kamu ngajarin aku arti kesabaran.",
+      "Karena kamu sering ngasih kejutan-kejutan kecil yang manis.",
+      "Karena kamu orang yang paling aku percaya.",
+      "Karena kamu nggak pernah bosan ngadepin kelakuanku.",
+      "Karena kamu selalu berusaha bikin aku ketawa pas lagi sedih.",
+      "Karena kamu pemaaf banget.",
+      "Karena kamu kasih space buat aku tumbuh berkembang.",
+      "Karena kamu adalah 'rumah' buat aku pulang.",
+      "Karena kamu bikin aku percaya lagi sama yang namanya cinta.",
+      "Karena kamu berani berjuang buat mimpi-mimpi kamu (Ganbatte Jepangnya!).",
+      "Karena kamu pintar ngambil hati keluargaku.",
+      "Karena cuma dengan bayangin kamu, aku bisa senyum sendiri.",
+      "Karena kamu selalu tau gimana cara bikin hatiku meleleh.",
+      "Karena momen apapun kalau bareng kamu jadinya sempurna.",
+      "Karena kamu pendengar yang sangat baik.",
+      "Karena kamu nggak pernah nyuruh aku berubah jadi orang lain.",
+      "Karena bau parfum/wangi kamu selalu bikin kangen.",
+      "Karena kamu jago bikin aku merasa jadi cowok paling beruntung.",
+      "Karena kamu selalu percaya sama aku.",
+      "Karena pipi kamu enak buat dicubit (secara virtual!).",
+      "Karena kamu punya ribuan cara buat bikin aku kangen.",
+      "Karena kamu bikin aku pengen ngabisin sisa hidupku sama kamu.",
+      "Karena senyum manismu itu candu.",
+      "Karena kamu ngangenin banget.",
+      "Karena setiap kata-kata semangat darimu kerasa ampuh banget.",
+      "Karena kamu mandiri tapi tetep butuh aku.",
+      "Karena kita punya hobi/hal kesukaan yang sama.",
+      "Karena kamu bisa jadi pacar sekaligus sahabat terbaikku.",
+      "Karena aku suka dengar suara kamu nyanyi/humming.",
+      "Karena kamu selalu pengen tau hariku berjalan kayak gimana.",
+      "Karena kamu suka hal-hal yang sederhana.",
+      "Karena kamu bikin aku berani bermimpi besar.",
+      "Karena nggak ada yang bisa gantiin posisi kamu di hatiku.",
+      "Karena kamu yang paling bisa bikin aku merinding bahagia.",
+      "Karena kamu sabar nungguin aku.",
+      "Karena kamu ngertiin kesibukanku.",
+      "Karena kamu sering ngirimin foto random keseharianmu.",
+      "Karena kamu selalu excited tiap kali aku ngasih sesuatu.",
+      "Karena kamu bikin aku pengen jadi pelindung kamu selamanya.",
+      "Karena sifat cemburu tipis-tipis kamu itu cute.",
+      "Karena kamu ngehargain privasiku.",
+      "Karena sama kamu, semua masalah ada jalan keluarnya.",
+      "Karena kamu selalu ngasih positive vibes.",
+      "Karena jujur, cuma kamu yang bisa bikin aku tergila-gila gini.",
+      "Karena kamu punya impian yang bikin aku ikut semangat.",
+      "Karena kamu tau makanan kesukaanku.",
+      "Karena kamu rajin ngingetin ibadah.",
+      "Karena aku cinta semua tentang kamu.",
+      "Karena kamu selalu berusaha luangin waktu di tengah kesibukan.",
+      "Karena kamu adalah Cindy Laura, gadis paling manis sedunia.",
+      "Pokoknya, karena kamu adalah KAMU! Aku sayang kamu selamanya! ❤️"
+    ];
+
+    const grid = document.getElementById('grid');
+
+    reasons.forEach((reason, index) => {
+      // Create scene
+      const scene = document.createElement('div');
+      scene.className = 'scene';
+      
+      // Add random rotation between -8deg and +8deg
+      const rot = (Math.random() * 16 - 8).toFixed(2);
+      scene.style.setProperty('--rot', `${rot}deg`);
+      
+      // Create card
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      // Toggle flip on click
+      scene.addEventListener('click', () => {
+        card.classList.toggle('is-flipped');
+        scene.classList.toggle('active-flip');
+      });
+
+      // Front face
+      const front = document.createElement('div');
+      front.className = 'card__face card__face--front';
+      front.textContent = index + 1;
+
+      // Back face
+      const back = document.createElement('div');
+      back.className = 'card__face card__face--back';
+      back.textContent = reason;
+
+      card.appendChild(front);
+      card.appendChild(back);
+      scene.appendChild(card);
+      grid.appendChild(scene);
+    });
+
+  </script>
+</body>
+</html>

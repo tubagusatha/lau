@@ -47,34 +47,45 @@
         padding: 0 20px;
       }
 
-      .back-button {
+      .back-button, .play-button {
         text-decoration: none;
         border-radius: 50px;
-        padding: 0 20px;
-        height: 50px;
+        padding: 12px 24px;
         color: #fff;
+        font-weight: 700;
+        background: rgba(255, 71, 126, 0.3);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 71, 126, 0.5);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         display: flex;
         align-items: center;
-        background: rgb(205, 5, 118);
+        justify-content: center;
+        width: auto;
+        height: auto;
       }
 
-      .play-button {
-        width: 90px;
-        height: 90px;
-        border-radius: 50%;
-        background-color: #ff6b81;
-        border: none;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s;
+      .back-button:hover, .play-button:hover {
+        background: #ff477e;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255, 71, 126, 0.5);
       }
-
-      .play-button:hover {
-        background-color: #4778ff;
-        transform: scale(1.05);
+      
+      @media (max-width: 768px) {
+        .back-button, .play-button {
+          padding: 12px 20px;
+          font-size: 13px;
+          background: rgba(20, 15, 30, 0.85);
+          border: 1px solid rgba(255, 71, 126, 0.5);
+        }
       }
 
       /* --- PARALLAX SECTION --- */

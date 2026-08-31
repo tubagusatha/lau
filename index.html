@@ -10,11 +10,8 @@
         margin: 0;
         padding: 0;
         width: 100%;
-        height: 100%;
-        overflow: hidden;
-        position: fixed;
-        background: #000; /* Background gelap */
-        touch-action: none; /* Cegah browser scroll saat swipe carousel */
+        min-height: 100%;
+        background: #000;
       }
       canvas {
         position: fixed;
@@ -34,7 +31,7 @@
     
     <div class="button-wrapper" id="sidebar">
       <button class="play-button" id="toggleMusic">Play</button>
-      <audio id="bgm" src="/img/abtyou.mp3" preload="auto"></audio>
+      <audio id="bgm" src="img/abtyou.mp3" preload="auto"></audio>
 
       <div class="go-to">
         <a href="page/page1.html">ILY</a>
@@ -50,27 +47,7 @@
       </div>
     </div>
 
-    <script>
-      const audio = document.getElementById("bgm");
-      const button = document.getElementById("toggleMusic");
 
-      button.addEventListener("click", () => {
-        if (audio.paused) {
-          audio.play();
-          button.textContent = "Stop";
-        } else {
-          audio.pause();
-          button.textContent = "Play";
-        }
-      });
-      const hamburger = document.getElementById("hamburger");
-      const sidebar = document.getElementById("sidebar");
-
-      hamburger.addEventListener("click", () => {
-        sidebar.classList.toggle("active");
-        hamburger.classList.toggle("active");
-      });
-    </script>
 
     <div class="carousel">
       <div class="carousel-item">
@@ -143,7 +120,7 @@
         <div class="carousel-box">
           <div class="title">😝</div>
           <div class="num">08</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid9.mp4" type="video/mp4" />
           </video>
         </div>
@@ -153,7 +130,7 @@
         <div class="carousel-box">
           <div class="title">😭</div>
           <div class="num">09</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid6.mp4" type="video/mp4" />
           </video>
         </div>
@@ -171,7 +148,7 @@
         <div class="carousel-box">
           <div class="title">😫</div>
           <div class="num">11</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid10.mp4" type="video/mp4" />
           </video>
         </div>
@@ -261,7 +238,7 @@
         <div class="carousel-box">
           <div class="title">😌</div>
           <div class="num">22</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid5.mp4" type="video/mp4" />
           </video>
         </div>
@@ -303,7 +280,7 @@
         <div class="carousel-box">
           <div class="title">🫢</div>
           <div class="num">27</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid8.mp4" type="video/mp4" />
           </video>
         </div>
@@ -321,7 +298,7 @@
         <div class="carousel-box">
           <div class="title">😦</div>
           <div class="num">29</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid7.mp4" type="video/mp4" />
           </video>
         </div>
@@ -331,7 +308,7 @@
         <div class="carousel-box">
           <div class="title">💕</div>
           <div class="num">30</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid11.mp4" type="video/mp4" />
           </video>
         </div>
@@ -381,7 +358,7 @@
         <div class="carousel-box">
           <div class="title">😽</div>
           <div class="num">36</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid2.mp4" type="video/mp4" />
           </video>
         </div>
@@ -399,7 +376,7 @@
         <div class="carousel-box">
           <div class="title">🥰</div>
           <div class="num">38</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid3.mp4" type="video/mp4" />
           </video>
         </div>
@@ -417,7 +394,7 @@
         <div class="carousel-box">
           <div class="title">😘</div>
           <div class="num">40</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid13.mp4" type="video/mp4" />
           </video>
         </div>
@@ -475,7 +452,7 @@
         <div class="carousel-box">
           <div class="title">🫡</div>
           <div class="num">47</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid4.mp4" type="video/mp4" />
           </video>
         </div>
@@ -525,7 +502,7 @@
         <div class="carousel-box">
           <div class="title">🥰</div>
           <div class="num">53</div>
-          <video autoplay loop muted playsinline>
+          <video loop muted playsinline preload="none">
             <source src="img/vid12.mp4" type="video/mp4" />
           </video>
         </div>
@@ -629,96 +606,6 @@
     <div class="cursor cursor2"></div>
     <script src="js/main.js"></script>
 
-    <script>
-      // ====== Animasi Canvas Lirik ======
-      window.onload = function () {
-        var lyric =
-          "Do you think I have forgotten about you? Do you think I have forgotten? " +
-          "Do you think I have forgotten? Do you think I have forgotten about you? " +
-          "There was something about you that now I can't remember " +
-          "It's the same damn thing that made my heart surrender " +
-          "And I'll miss you on a train I'll miss you in the morning " +
-          "I never know what to think about, so think about you (I think about you)";
 
-        var words = {};
-        var words_attr = [];
-        string_handle(lyric);
-
-        var canvas = document.getElementById("c");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        if (canvas.getContext) {
-          var c = canvas.getContext("2d"),
-            w = canvas.width,
-            h = canvas.height;
-
-          c.strokeStyle = "red";
-          c.fillStyle = "white";
-          c.lineWidth = 1;
-
-          Word = function (key) {
-            this.text = key;
-            this.x = Math.random() * w;
-            this.y = Math.random() * h;
-            this.font = words[key] * 10 + "px Arial";
-            this.speed = words[key] * 0.5;
-          };
-          for (var key in words) {
-            words_attr.push(new Word(key));
-          }
-
-          function animation() {
-            for (var i = 0; i < words_attr.length; i++) {
-              c.font = words_attr[i].font;
-              c.fillText(words_attr[i].text, words_attr[i].x, words_attr[i].y);
-              words_attr[i].width = c.measureText(words_attr[i].text).width;
-              c.stroke();
-            }
-            move();
-          }
-
-          function move() {
-            for (var i = 0; i < words_attr.length; i++) {
-              if (words_attr[i].x > w) {
-                words_attr[i].x = -words_attr[i].width;
-                words_attr[i].y = Math.random() * h;
-              } else {
-                words_attr[i].x += words_attr[i].speed;
-              }
-            }
-          }
-
-          setInterval(function () {
-            c.clearRect(0, 0, w, h);
-            animation();
-          }, 24);
-        }
-
-        function string_handle(str) {
-          var split_str = str.split(" ");
-          var word_array = [];
-          var word_count = [];
-          for (var i = 0; i < split_str.length; i++) {
-            var check = true;
-            for (var j = 0; j < word_array.length; j++) {
-              if (split_str[i] === word_array[j]) {
-                word_count[j]++;
-                check = false;
-                break;
-              }
-            }
-            if (check) {
-              word_array.push(split_str[i]);
-              word_count.push(1);
-            }
-          }
-          for (var i = 0; i < word_array.length; i++) {
-            words[word_array[i]] = word_count[i];
-          }
-          return words;
-        }
-      };
-    </script>
   </body>
 </html>

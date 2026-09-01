@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LAURAA</title>
     <link rel="stylesheet" href="style/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet" />
     <style>
       html, body {
         margin: 0;
@@ -22,9 +23,48 @@
         left: 0;
         z-index: -1; /* Agar canvas berada di belakang carousel */
       }
+      
+      /* CINEMATIC LOADER */
+      #cute-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #050505; 
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
+      }
+      
+      .loader-text {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 20px;
+        font-weight: 300;
+        color: #fff;
+        text-transform: uppercase;
+        animation: breathe 2s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      @keyframes breathe {
+        0% { opacity: 0.2; letter-spacing: 6px; filter: blur(2px); }
+        100% { opacity: 1; letter-spacing: 14px; filter: blur(0px); text-shadow: 0 0 15px rgba(255, 71, 126, 0.5); }
+      }
+      
+      .fade-out {
+        opacity: 0 !important;
+        visibility: hidden !important;
+      }
     </style>
   </head>
   <body>
+    <!-- LOADER SCREEN -->
+    <div id="cute-loader">
+      <div class="loader-text">LAURAA</div>
+    </div>
+    
     <canvas id="c"></canvas>
     <button class="hamburger" id="hamburger">
       <span></span>
@@ -72,6 +112,13 @@
       hamburger.addEventListener("click", () => {
         sidebar.classList.toggle("active");
         hamburger.classList.toggle("active");
+      });
+
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          const loader = document.getElementById("cute-loader");
+          if (loader) loader.classList.add("fade-out");
+        }, 1200); // Waktu yang pas buat nikmatin transisi cinematic
       });
     </script>
 
